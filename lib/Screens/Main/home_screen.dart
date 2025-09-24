@@ -131,8 +131,8 @@ class _ModernDashboardState extends ConsumerState<HomeScreen>
                 );
               },
               icon: const Icon(Icons.location_on, color: Colors.white),
-              label: const Text('By Address',
-                  style: TextStyle(color: Colors.white)),
+              label:
+                  const Text('By Area', style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
               ),

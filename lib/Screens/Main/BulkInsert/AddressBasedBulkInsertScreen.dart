@@ -56,33 +56,23 @@ class _AddressBasedBulkInsertScreenState
   }
 
   Future<void> _loadPartyNames(String lineName) async {
-    final details = await dbLending.getLendingDetailsByLineName(lineName);
+    final details =
+        await dbLending.getLendingDetailsWithAddressByLineName(lineName);
+    final addresses = await dbLending.getUniqueAddressesByLineName(lineName);
+
     if (details != null) {
       setState(() {
         lendingDetails = details
             .where((detail) => detail['status'] == 'active')
             .map((detail) => Map<String, dynamic>.from(detail))
             .toList();
+        uniqueAddresses = addresses;
+        _selectedAddress = null;
         _resetData();
         _initializeControllers();
-        _extractUniqueAddresses();
       });
       await _checkCollectionsForDate();
     }
-  }
-
-  void _extractUniqueAddresses() {
-    Set<String> addressSet = {};
-    for (var detail in lendingDetails) {
-      String address = detail['PartyAdd']?.toString().trim() ?? '';
-      if (address.isNotEmpty && address.toLowerCase() != 'unknown') {
-        addressSet.add(address);
-      }
-    }
-    setState(() {
-      uniqueAddresses = addressSet.toList()..sort();
-      _selectedAddress = null;
-    });
   }
 
   Future<bool> _hasCollectionForDate(int lenId, String date) async {
@@ -657,9 +647,9 @@ class _AddressBasedBulkInsertScreenState
 
                           return Card(
                             color: isSelected
-                                ? Colors.blue.shade50
+                                ? Colors.teal.shade50
                                 : (hasCollectionToday[lenId] == true
-                                    ? Colors.pink.shade50
+                                    ? Colors.orange.shade100
                                     : null),
                             child: ListTile(
                               leading: Checkbox(

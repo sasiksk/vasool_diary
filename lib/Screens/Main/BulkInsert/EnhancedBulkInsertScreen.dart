@@ -744,9 +744,9 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
 
                           return Card(
                             color: isSelected
-                                ? Colors.blue.shade50
+                                ? Colors.teal.shade50
                                 : (hasCollectionToday[lenId] == true
-                                    ? Colors.pink.shade50
+                                    ? Colors.orange.shade100
                                     : null),
                             child: ListTile(
                               leading: Checkbox(

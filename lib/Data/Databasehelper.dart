@@ -940,6 +940,62 @@ class dbLending {
       whereArgs: [lineName, partyName],
     );
   }
+
+  // New function to get unique addresses for a specific line name
+  static Future<List<String>> getUniqueAddressesByLineName(
+      String lineName) async {
+    final db = await DatabaseHelper.getDatabase();
+    final List<Map<String, dynamic>> result = await db.query(
+      'Lending',
+      columns: ['PartyAdd'],
+      where: 'LineName = ? AND status = ?',
+      whereArgs: [lineName, 'active'],
+      distinct: true,
+    );
+
+    // Filter out null, empty, and 'unknown' addresses
+    List<String> addresses = [];
+    for (var row in result) {
+      String address = row['PartyAdd']?.toString().trim() ?? '';
+      if (address.isNotEmpty &&
+          address.toLowerCase() != 'unknown' &&
+          address.toLowerCase() != 'null') {
+        addresses.add(address);
+      }
+    }
+
+    // Remove duplicates and sort
+    return addresses.toSet().toList()..sort();
+  }
+
+  // New function to get lending details with addresses for address-based filtering
+  static Future<List<Map<String, dynamic>>?>
+      getLendingDetailsWithAddressByLineName(String lineName) async {
+    final db = await DatabaseHelper.getDatabase();
+    final List<Map<String, dynamic>> result = await db.query(
+      'Lending',
+      columns: [
+        'LenId',
+        'PartyName',
+        'PartyAdd',
+        'amtgiven',
+        'sms',
+        'profit',
+        'amtcollected',
+        'duedays',
+        'status',
+        'PartyPhnone'
+      ],
+      where: 'LineName = ? AND status = ?',
+      whereArgs: [lineName, 'active'],
+    );
+
+    if (result.isNotEmpty) {
+      return result;
+    } else {
+      return null;
+    }
+  }
 }
 
 class CollectionDB {
