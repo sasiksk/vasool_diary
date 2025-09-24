@@ -53,7 +53,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDW3KJCrtLGyPKEowsa5iMW4HkpU2u66xE',
+    apiKey: 'AIzasasiSyDW3KJCrtLGyPKEowsa5iMW4HkpU2u66xE',
     appId: '1:994574056397:android:f671913217fd630d1ee284',
     messagingSenderId: '994574056397',
     projectId: 'skfinance-a8744',
