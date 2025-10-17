@@ -29,6 +29,7 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
 
   List<Map<String, String>> pendingSmsMessages = [];
   bool isProcessing = false;
+  bool _isWeeklyView = false; // Daily by default
 
   @override
   void initState() {
@@ -61,7 +62,7 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Enhanced Bulk Entry'),
+          title: const Text('Collection Entry'),
           content: const Text(
               'Select parties and amounts, then use Bulk Update. SMS will be sent individually with confirmation.'),
           actions: <Widget>[
@@ -127,9 +128,30 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
       final lenId = detail['LenId'];
       final perDayAmt =
           (detail['amtgiven'] + detail['profit']) / detail['duedays'];
+
+      // Calculate amount based on Daily/Weekly selection
+      final displayAmount =
+          _isWeeklyView ? (perDayAmt * 7).roundToDouble() : perDayAmt;
+
       amountControllers[lenId] =
-          TextEditingController(text: perDayAmt.toStringAsFixed(2));
+          TextEditingController(text: displayAmount.toStringAsFixed(2));
       selectedParties[lenId] = false;
+    }
+  }
+
+  void _refreshAmountsForToggle() {
+    for (var detail in lendingDetails) {
+      final lenId = detail['LenId'];
+      final perDayAmt =
+          (detail['amtgiven'] + detail['profit']) / detail['duedays'];
+
+      // Calculate amount based on Daily/Weekly selection
+      final displayAmount =
+          _isWeeklyView ? (perDayAmt * 7).roundToDouble() : perDayAmt;
+
+      if (amountControllers[lenId] != null) {
+        amountControllers[lenId]!.text = displayAmount.toStringAsFixed(2);
+      }
     }
   }
 
@@ -548,96 +570,6 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
         .toList();
   }
 
-  Widget _buildHeaderControls() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            _buildLineAndDateRow(),
-            const SizedBox(height: 12),
-            _buildSearchField(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLineAndDateRow() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 3,
-          child: _buildLineDropdown(),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          flex: 2,
-          child: _buildDateInput(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLineDropdown() {
-    return DropdownButtonFormField<String>(
-      decoration: _buildInputDecoration(label: 'Line Name'),
-      value: _selectedLineName,
-      items: _lineNames.map(_buildDropdownItem).toList(),
-      onChanged: _handleLineChange,
-    );
-  }
-
-  DropdownMenuItem<String> _buildDropdownItem(String value) {
-    return DropdownMenuItem(
-      value: value,
-      child: Text(value),
-    );
-  }
-
-  void _handleLineChange(String? value) {
-    setState(() => _selectedLineName = value);
-    if (value != null) _loadPartyNames(value);
-  }
-
-  Widget _buildDateInput() {
-    return TextFormField(
-      controller: _dateController,
-      decoration: _buildInputDecoration(
-        label: 'Date',
-        suffixIcon: const Icon(Icons.calendar_today, size: 12),
-      ),
-      readOnly: true,
-      onTap: _selectDate,
-    );
-  }
-
-  Widget _buildSearchField() {
-    return TextFormField(
-      controller: _searchController,
-      decoration: _buildInputDecoration(
-        label: 'Search Party',
-        prefixIcon: const Icon(Icons.search, size: 18),
-      ),
-      onChanged: _filterParties,
-    );
-  }
-
-  InputDecoration _buildInputDecoration({
-    required String label,
-    Widget? prefixIcon,
-    Widget? suffixIcon,
-  }) {
-    return InputDecoration(
-      labelText: label,
-      border: const OutlineInputBorder(),
-      isDense: true,
-      contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-      prefixIcon: prefixIcon,
-      suffixIcon: suffixIcon,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -715,6 +647,221 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                           prefixIcon: Icon(Icons.search, size: 18),
                         ),
                         onChanged: _filterParties,
+                      ),
+                      const SizedBox(height: 12),
+                      // Enhanced Daily/Weekly Toggle
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.grey.shade50, Colors.grey.shade100],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          border:
+                              Border.all(color: Colors.grey.shade300, width: 1),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade200,
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(4),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeInOut,
+                                height: 40, // Reduced height
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(
+                                          6), // Slightly smaller radius
+                                      bottomLeft: Radius.circular(6),
+                                    ),
+                                    onTap: () {
+                                      if (_isWeeklyView) {
+                                        setState(() {
+                                          _isWeeklyView = false;
+                                        });
+                                        _refreshAmountsForToggle();
+                                      }
+                                    },
+                                    child: AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      curve: Curves.easeInOut,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10), // Reduced padding
+                                      decoration: BoxDecoration(
+                                        gradient: !_isWeeklyView
+                                            ? LinearGradient(
+                                                colors: [
+                                                  Colors.teal
+                                                      .shade700, // Slightly lighter shade
+                                                  Colors.teal.shade800
+                                                ],
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                              )
+                                            : null,
+                                        color: _isWeeklyView
+                                            ? Colors.grey.shade100
+                                            : null, // Added background for inactive state
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(6),
+                                          bottomLeft: Radius.circular(6),
+                                        ),
+                                        border: Border.all(
+                                          color: _isWeeklyView
+                                              ? Colors.grey.shade300
+                                              : Colors.transparent,
+                                          width: 1,
+                                        ),
+                                        boxShadow: !_isWeeklyView
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.teal.shade800
+                                                      .withOpacity(
+                                                          0.2), // Softer shadow
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 1),
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.calendar_today,
+                                            size: 16, // Smaller icon
+                                            color: !_isWeeklyView
+                                                ? Colors.white
+                                                : Colors.grey.shade600,
+                                          ),
+                                          const SizedBox(
+                                              width: 4), // Reduced spacing
+                                          Text(
+                                            'Daily',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: !_isWeeklyView
+                                                  ? Colors.white
+                                                  : Colors.grey.shade700,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 13, // Smaller font
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                                width: 1), // Smaller gap between buttons
+                            Expanded(
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeInOut,
+                                height: 40, // Reduced height
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: const BorderRadius.only(
+                                      topRight: Radius.circular(6),
+                                      bottomRight: Radius.circular(6),
+                                    ),
+                                    onTap: () {
+                                      if (!_isWeeklyView) {
+                                        setState(() {
+                                          _isWeeklyView = true;
+                                        });
+                                        _refreshAmountsForToggle();
+                                      }
+                                    },
+                                    child: AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      curve: Curves.easeInOut,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10), // Reduced padding
+                                      decoration: BoxDecoration(
+                                        gradient: _isWeeklyView
+                                            ? LinearGradient(
+                                                colors: [
+                                                  Colors.teal.shade700,
+                                                  Colors.teal.shade800
+                                                ],
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                              )
+                                            : null,
+                                        color: !_isWeeklyView
+                                            ? Colors.grey.shade100
+                                            : null, // Added background for inactive state
+                                        borderRadius: const BorderRadius.only(
+                                          topRight: Radius.circular(6),
+                                          bottomRight: Radius.circular(6),
+                                        ),
+                                        border: Border.all(
+                                          color: !_isWeeklyView
+                                              ? Colors.grey.shade300
+                                              : Colors.transparent,
+                                          width: 1,
+                                        ),
+                                        boxShadow: _isWeeklyView
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.teal.shade800
+                                                      .withOpacity(0.2),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 1),
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.view_week,
+                                            size: 16, // Smaller icon
+                                            color: _isWeeklyView
+                                                ? Colors.white
+                                                : Colors.grey.shade600,
+                                          ),
+                                          const SizedBox(
+                                              width: 4), // Reduced spacing
+                                          Text(
+                                            'Weekly',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: _isWeeklyView
+                                                  ? Colors.white
+                                                  : Colors.grey.shade700,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 13, // Smaller font
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

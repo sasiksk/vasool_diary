@@ -12,6 +12,7 @@ import 'package:kskfinance/Data/Databasehelper.dart';
 import 'package:kskfinance/Screens/UtilScreens/Restore.dart';
 import 'package:kskfinance/Utilities/Reports/CustomerReportScreen.dart';
 import 'package:kskfinance/Screens/Main/home_screen.dart';
+import 'package:kskfinance/Utilities/app_rating_share.dart';
 
 Widget buildDrawer(BuildContext context) {
   return Drawer(
@@ -107,6 +108,37 @@ Widget buildDrawer(BuildContext context) {
                 onTap: () => _navigateTo(context, const ViewReportsPage()),
               ),
               const Divider(thickness: 1),
+
+              // App Rating & Sharing Section
+              _buildDrawerItem(
+                context,
+                icon: Icons.star,
+                title: 'Rate App',
+                onTap: () {
+                  Navigator.pop(context);
+                  AppRatingShare.showRateAppDialog(context);
+                },
+              ),
+              _buildDrawerItem(
+                context,
+                icon: Icons.share,
+                title: 'Share App',
+                onTap: () {
+                  Navigator.pop(context);
+                  AppRatingShare.showShareAppSheet(context);
+                },
+              ),
+              _buildDrawerItem(
+                context,
+                icon: Icons.system_update,
+                title: 'Update App',
+                onTap: () {
+                  Navigator.pop(context);
+                  AppRatingShare.rateApp();
+                },
+              ),
+              const Divider(thickness: 1),
+
               _buildDrawerItem(
                 context,
                 icon: Icons.restore_from_trash,

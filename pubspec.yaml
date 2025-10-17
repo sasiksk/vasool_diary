@@ -2,7 +2,7 @@ name: kskfinance  # Changed from vasool_diary to match new project
 description: "KSK Finance Management App"
 publish_to: 'none'
 
-version: 1.0.5+25  # Incremented version code
+version: 1.0.5+28  # Incremented version code
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -27,6 +27,7 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   lottie: ^3.3.0
   dropdown_search: ^6.0.2
+  searchable_paginated_dropdown: ^1.3.0
   
   # Charts (compatible version)
   fl_chart: ^0.68.0

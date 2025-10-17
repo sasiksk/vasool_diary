@@ -59,6 +59,8 @@ class PartyDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
+  bool _isWeeklyView = false; // Local toggle state for weekly/daily view
+
   Widget _buildSummaryItem(String label, double amount, Color color,
       {String? additionalInfo}) {
     return Column(
@@ -161,7 +163,6 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
               }
             },
           ),
-          const SizedBox(width: 12), // Add gap between actions
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
@@ -241,6 +242,80 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Day View / Week View Toggle
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(25),
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _isWeeklyView = false;
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: !_isWeeklyView
+                                            ? Colors.blue
+                                            : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        'Day View',
+                                        style: TextStyle(
+                                          color: !_isWeeklyView
+                                              ? Colors.white
+                                              : Colors.black54,
+                                          fontWeight: !_isWeeklyView
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _isWeeklyView = true;
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: _isWeeklyView
+                                            ? Colors.blue
+                                            : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        'Week View',
+                                        style: TextStyle(
+                                          color: _isWeeklyView
+                                              ? Colors.white
+                                              : Colors.black54,
+                                          fontWeight: _isWeeklyView
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -304,14 +379,18 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Days Over:',
-                                      style: TextStyle(
+                                    Text(
+                                      _isWeeklyView
+                                          ? 'Weeks Over:'
+                                          : 'Days Over:',
+                                      style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
                                     ),
                                     Text(
-                                      '${daysover ?? 0}',
+                                      _isWeeklyView
+                                          ? '${((daysover ?? 0) / 7).toStringAsFixed(1)}'
+                                          : '${daysover ?? 0}',
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
@@ -321,16 +400,20 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Days',
-                                      style: TextStyle(
+                                    Text(
+                                      _isWeeklyView ? 'Weeks' : 'Days',
+                                      style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
                                     ),
                                     Text(
                                       daysrem != null && daysrem < 0
-                                          ? 'Overdue: ${daysrem.abs()}'
-                                          : 'Remaining: $daysrem',
+                                          ? (_isWeeklyView
+                                              ? 'Overdue: ${(daysrem.abs() / 7).toStringAsFixed(1)}'
+                                              : 'Overdue: ${daysrem.abs()}')
+                                          : (_isWeeklyView
+                                              ? 'Remaining: ${(daysrem / 7).toStringAsFixed(1)}'
+                                              : 'Remaining: $daysrem'),
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w900,
@@ -350,14 +433,18 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Days Paid:',
-                                      style: TextStyle(
+                                    Text(
+                                      _isWeeklyView
+                                          ? 'Weeks Paid:'
+                                          : 'Days Paid:',
+                                      style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
                                     ),
                                     Text(
-                                      '${'${givendays.toStringAsFixed(2)}' ?? 0}',
+                                      _isWeeklyView
+                                          ? '${(givendays / 7).toStringAsFixed(1)}'
+                                          : '${givendays.toStringAsFixed(2)}',
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
@@ -369,8 +456,12 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                   children: [
                                     Text(
                                       pendays < 0
-                                          ? 'Advance Days Paid: ${pendays.abs().toStringAsFixed(2)}'
-                                          : 'Pending Days: ${pendays.toStringAsFixed(2)}',
+                                          ? (_isWeeklyView
+                                              ? 'Advance Weeks Paid: ${(pendays.abs() / 7).toStringAsFixed(1)}'
+                                              : 'Advance Days Paid: ${pendays.abs().toStringAsFixed(2)}')
+                                          : (_isWeeklyView
+                                              ? 'Pending Weeks: ${(pendays / 7).toStringAsFixed(1)}'
+                                              : 'Pending Days: ${pendays.toStringAsFixed(2)}'),
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w900,

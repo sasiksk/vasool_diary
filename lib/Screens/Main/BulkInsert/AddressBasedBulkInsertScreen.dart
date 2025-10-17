@@ -31,6 +31,7 @@ class _AddressBasedBulkInsertScreenState
 
   List<Map<String, String>> pendingSmsMessages = [];
   bool isProcessing = false;
+  bool _isWeeklyView = false; // Daily by default
 
   @override
   void initState() {
@@ -112,9 +113,30 @@ class _AddressBasedBulkInsertScreenState
       final lenId = detail['LenId'];
       final perDayAmt =
           (detail['amtgiven'] + detail['profit']) / detail['duedays'];
+
+      // Calculate amount based on Daily/Weekly selection
+      final displayAmount =
+          _isWeeklyView ? (perDayAmt * 7).roundToDouble() : perDayAmt;
+
       amountControllers[lenId] =
-          TextEditingController(text: perDayAmt.toStringAsFixed(2));
+          TextEditingController(text: displayAmount.toStringAsFixed(2));
       selectedParties[lenId] = false;
+    }
+  }
+
+  void _refreshAmountsForToggle() {
+    for (var detail in lendingDetails) {
+      final lenId = detail['LenId'];
+      final perDayAmt =
+          (detail['amtgiven'] + detail['profit']) / detail['duedays'];
+
+      // Calculate amount based on Daily/Weekly selection
+      final displayAmount =
+          _isWeeklyView ? (perDayAmt * 7).roundToDouble() : perDayAmt;
+
+      if (amountControllers[lenId] != null) {
+        amountControllers[lenId]!.text = displayAmount.toStringAsFixed(2);
+      }
     }
   }
 
@@ -618,6 +640,215 @@ class _AddressBasedBulkInsertScreenState
                             _selectedAddress = value;
                           });
                         },
+                      ),
+                      const SizedBox(height: 12),
+                      // Daily/Weekly Toggle
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.grey.shade50, Colors.grey.shade100],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                          border:
+                              Border.all(color: Colors.grey.shade300, width: 1),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade200.withOpacity(0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        height: 40,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeInOut,
+                                height: 40,
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(6),
+                                      bottomLeft: Radius.circular(6),
+                                    ),
+                                    onTap: () {
+                                      if (_isWeeklyView) {
+                                        setState(() {
+                                          _isWeeklyView = false;
+                                        });
+                                        _refreshAmountsForToggle();
+                                      }
+                                    },
+                                    child: AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      curve: Curves.easeInOut,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      decoration: BoxDecoration(
+                                        gradient: !_isWeeklyView
+                                            ? LinearGradient(
+                                                colors: [
+                                                  Colors.teal.shade700,
+                                                  Colors.teal.shade800
+                                                ],
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                              )
+                                            : null,
+                                        color: _isWeeklyView
+                                            ? Colors.grey.shade100
+                                            : null,
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(6),
+                                          bottomLeft: Radius.circular(6),
+                                        ),
+                                        border: Border.all(
+                                          color: _isWeeklyView
+                                              ? Colors.grey.shade300
+                                              : Colors.transparent,
+                                          width: 1,
+                                        ),
+                                        boxShadow: !_isWeeklyView
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.teal.shade800
+                                                      .withOpacity(0.2),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 1),
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.calendar_today,
+                                            size: 16,
+                                            color: !_isWeeklyView
+                                                ? Colors.white
+                                                : Colors.grey.shade600,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Daily',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: !_isWeeklyView
+                                                  ? Colors.white
+                                                  : Colors.grey.shade700,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 1),
+                            Expanded(
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeInOut,
+                                height: 40,
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: const BorderRadius.only(
+                                      topRight: Radius.circular(6),
+                                      bottomRight: Radius.circular(6),
+                                    ),
+                                    onTap: () {
+                                      if (!_isWeeklyView) {
+                                        setState(() {
+                                          _isWeeklyView = true;
+                                        });
+                                        _refreshAmountsForToggle();
+                                      }
+                                    },
+                                    child: AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      curve: Curves.easeInOut,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10),
+                                      decoration: BoxDecoration(
+                                        gradient: _isWeeklyView
+                                            ? LinearGradient(
+                                                colors: [
+                                                  Colors.teal.shade700,
+                                                  Colors.teal.shade800
+                                                ],
+                                                begin: Alignment.topCenter,
+                                                end: Alignment.bottomCenter,
+                                              )
+                                            : null,
+                                        color: !_isWeeklyView
+                                            ? Colors.grey.shade100
+                                            : null,
+                                        borderRadius: const BorderRadius.only(
+                                          topRight: Radius.circular(6),
+                                          bottomRight: Radius.circular(6),
+                                        ),
+                                        border: Border.all(
+                                          color: !_isWeeklyView
+                                              ? Colors.grey.shade300
+                                              : Colors.transparent,
+                                          width: 1,
+                                        ),
+                                        boxShadow: _isWeeklyView
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.teal.shade800
+                                                      .withOpacity(0.2),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 1),
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.view_week,
+                                            size: 16,
+                                            color: _isWeeklyView
+                                                ? Colors.white
+                                                : Colors.grey.shade600,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Weekly',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: _isWeeklyView
+                                                  ? Colors.white
+                                                  : Colors.grey.shade700,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

@@ -13,6 +13,7 @@ import 'package:kskfinance/Screens/UtilScreens/Backuppage.dart';
 import 'package:kskfinance/Utilities/AppBar.dart';
 import 'package:kskfinance/Utilities/Reports/CustomerReportScreen.dart';
 import 'package:kskfinance/Utilities/Reports/PendingReport/PartyPendingDetailsScreen.dart';
+import 'package:kskfinance/Utilities/Reports/Dailyreport/PartyReportPage.dart';
 import 'package:kskfinance/Utilities/backup_helper.dart';
 import 'package:kskfinance/Utilities/drawer.dart';
 import 'package:kskfinance/Utilities/FloatingActionButtonWithText.dart';
@@ -666,7 +667,7 @@ class _ModernDashboardState extends ConsumerState<HomeScreen>
   Widget _buildQuickActionsCard() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
@@ -682,111 +683,201 @@ class _ModernDashboardState extends ConsumerState<HomeScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Quick Actions',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 6),
           Row(
             children: [
-              Expanded(
-                child: _buildActionButton(
-                  'Collection Entry',
-                  Icons.upload_file,
-                  Colors.purple,
-                  () {
-                    _showCollectionTypeDialog();
-                  },
-                ),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: _buildActionButton(
-                  'Backup',
-                  Icons.backup,
-                  Colors.green,
-                  () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const DownloadDBScreen()),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                child: _buildActionButton(
-                  'Pending\nFollow up',
-                  Icons.restore,
-                  Colors.orange,
-                  () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PartyPendingDetailsScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 6),
-              Expanded(
-                child: _buildActionButton(
-                  'Reports',
-                  Icons.assessment,
-                  Colors.blue,
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ViewReportsPage()),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.flash_on,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                'Quick Actions',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 16),
+          // Floating Scrollable Actions with Enhanced Physics
+          SizedBox(
+            height: 120,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              itemCount: 5,
+              itemBuilder: (context, index) {
+                final actions = [
+                  {
+                    'title': 'Collection\nEntry',
+                    'icon': Icons.payments,
+                    'color': const Color(0xFF667eea),
+                    'isPrimary': true,
+                    'onTap': () => _showCollectionTypeDialog(),
+                  },
+                  {
+                    'title': 'Party\nReport',
+                    'icon': Icons.analytics,
+                    'color': const Color(0xFF764ba2),
+                    'isPrimary': true,
+                    'onTap': () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const PartyReportPage()),
+                        ),
+                  },
+                  {
+                    'title': 'Backup\nData',
+                    'icon': Icons.cloud_upload,
+                    'color': const Color(0xFF42A5F5),
+                    'isPrimary': false,
+                    'onTap': () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const DownloadDBScreen()),
+                        ),
+                  },
+                  {
+                    'title': 'Follow Up',
+                    'icon': Icons.schedule,
+                    'color': const Color(0xFF81D4FA),
+                    'isPrimary': false,
+                    'onTap': () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const PartyPendingDetailsScreen(),
+                          ),
+                        ),
+                  },
+                  {
+                    'title': 'All\nReports',
+                    'icon': Icons.folder_open,
+                    'color': const Color(0xFF2196F3),
+                    'isPrimary': false,
+                    'onTap': () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ViewReportsPage()),
+                        ),
+                  },
+                ];
+
+                final action = actions[index];
+                return Container(
+                  margin: const EdgeInsets.only(right: 12),
+                  child: TweenAnimationBuilder<double>(
+                    duration: Duration(milliseconds: 300 + (index * 50)),
+                    tween: Tween<double>(begin: 0, end: 1),
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: 0.8 + (0.2 * value),
+                        child: Opacity(
+                          opacity: value,
+                          child: _buildScrollableActionButton(
+                            action['title'] as String,
+                            action['icon'] as IconData,
+                            action['color'] as Color,
+                            action['onTap'] as VoidCallback,
+                            isPrimary: action['isPrimary'] as bool,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildActionButton(
-      String title, IconData icon, Color color, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [color.withOpacity(0.1), color.withOpacity(0.2)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+  Widget _buildScrollableActionButton(
+      String title, IconData icon, Color color, VoidCallback onTap,
+      {bool isPrimary = false}) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: 100,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            gradient: isPrimary
+                ? LinearGradient(
+                    colors: [color, color.withOpacity(0.8)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : LinearGradient(
+                    colors: [color.withOpacity(0.1), color.withOpacity(0.15)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+            borderRadius: BorderRadius.circular(16),
+            border: isPrimary
+                ? null
+                : Border.all(color: color.withOpacity(0.3), width: 1.5),
+            boxShadow: isPrimary
+                ? [
+                    BoxShadow(
+                      color: color.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    )
+                  ]
+                : [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    )
+                  ],
           ),
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: color.withOpacity(0.3)),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 30),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: color,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: isPrimary ? Colors.white : color,
+                size: isPrimary ? 32 : 28,
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: isPrimary ? 12 : 11,
+                  fontWeight: FontWeight.w600,
+                  color: isPrimary ? Colors.white : color,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1043,10 +1134,9 @@ class _ModernDashboardState extends ConsumerState<HomeScreen>
               onPressed: () async {
                 final newFinanceName = financeNameController.text;
                 if (newFinanceName.isNotEmpty) {
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  await prefs.setString('financeName', newFinanceName);
-                  ref.read(financeProvider.notifier).state = newFinanceName;
+                  await ref
+                      .read(financeProvider.notifier)
+                      .saveFinanceName(newFinanceName);
                   Navigator.of(context).pop();
                 }
               },

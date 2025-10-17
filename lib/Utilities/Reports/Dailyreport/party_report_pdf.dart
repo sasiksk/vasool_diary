@@ -1,9 +1,14 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:open_file/open_file.dart';
+import 'package:share_plus/share_plus.dart';
 
 Future<void> generatePartyReportPdf(
     List<Map<String, dynamic>> summaryList, String financeName) async {
@@ -177,3 +182,5 @@ Future<void> generatePartyReportPdf(
   await file.writeAsBytes(await pdf.save());
   await OpenFile.open(file.path);
 }
+
+// New function to generate and share as image

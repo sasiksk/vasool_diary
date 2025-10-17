@@ -15,12 +15,20 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
   bool _loading = false;
   List<Map<String, dynamic>> _summaryList = [];
   List<String> _partyNames = [];
+  List<String> _filteredPartyNames = [];
   String _selectedParty = 'All';
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _fetchSummaryList();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchSummaryList() async {
@@ -32,6 +40,24 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
         'All',
         ...{for (var s in summaryList) (s['PartyName'] ?? '').toString()}
       ];
+      _filteredPartyNames = List.from(_partyNames);
+    });
+  }
+
+  void _filterPartyNames(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredPartyNames = List.from(_partyNames);
+      } else {
+        _filteredPartyNames = _partyNames
+            .where((name) => name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+      // Reset selection if current party is not in filtered list
+      if (!_filteredPartyNames.contains(_selectedParty)) {
+        _selectedParty =
+            _filteredPartyNames.isNotEmpty ? _filteredPartyNames.first : 'All';
+      }
     });
   }
 
@@ -79,7 +105,7 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
               ),
               const SizedBox(height: 20),
 
-              // Dropdown Section
+              // Search & Select Section
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -91,23 +117,116 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Select Party', style: theme.textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    DropdownButton<String>(
-                      value: _selectedParty,
-                      isExpanded: true,
-                      items: _partyNames
-                          .map((name) => DropdownMenuItem(
-                                value: name,
-                                child: Text(name.isEmpty ? '(Unnamed)' : name),
-                              ))
-                          .toList(),
+                    Text('Search & Select Party',
+                        style: theme.textTheme.titleMedium),
+                    const SizedBox(height: 12),
+
+                    // Search Field
+                    TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Type to search party names...',
+                        prefixIcon: const Icon(Icons.search),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                            color: _searchController.text.isNotEmpty
+                                ? Colors.grey.shade600
+                                : Colors.transparent,
+                          ),
+                          onPressed: _searchController.text.isNotEmpty
+                              ? () {
+                                  setState(() {
+                                    _searchController.clear();
+                                    _filteredPartyNames =
+                                        List.from(_partyNames);
+                                    // Reset to 'All' when clearing search
+                                    _selectedParty = 'All';
+                                  });
+                                }
+                              : null,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.blue.shade300),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                      ),
                       onChanged: (value) {
-                        if (value != null) {
-                          setState(() => _selectedParty = value);
-                        }
+                        _filterPartyNames(value);
+                        setState(
+                            () {}); // Refresh to update clear button visibility
                       },
                     ),
+
+                    const SizedBox(height: 12),
+
+                    // Party Count Info
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Select Party', style: theme.textTheme.bodyMedium),
+                        Text('Found ${_filteredPartyNames.length} parties',
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.grey.shade600)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Filtered Dropdown
+                    _filteredPartyNames.isEmpty
+                        ? Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.info_outline,
+                                    color: Colors.grey.shade500, size: 20),
+                                const SizedBox(width: 8),
+                                const Text('No parties found',
+                                    style: TextStyle(color: Colors.grey)),
+                              ],
+                            ),
+                          )
+                        : DropdownButton<String>(
+                            value: _filteredPartyNames.contains(_selectedParty)
+                                ? _selectedParty
+                                : (_filteredPartyNames.isNotEmpty
+                                    ? _filteredPartyNames.first
+                                    : 'All'),
+                            isExpanded: true,
+                            items: _filteredPartyNames
+                                .map((name) => DropdownMenuItem(
+                                      value: name,
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            name == 'All'
+                                                ? Icons.select_all
+                                                : Icons.person_outline,
+                                            size: 18,
+                                            color: name == 'All'
+                                                ? Colors.blue.shade600
+                                                : Colors.grey.shade600,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(name.isEmpty
+                                              ? '(Unnamed)'
+                                              : name),
+                                        ],
+                                      ),
+                                    ))
+                                .toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() => _selectedParty = value);
+                              }
+                            },
+                          ),
                   ],
                 ),
               ),
