@@ -5,6 +5,7 @@ import 'package:kskfinance/Screens/Main/BulkInsert/CollectionEntryScreen.dart';
 import 'package:kskfinance/Screens/Main/BulkInsert/EnhancedBulkInsertScreen.dart';
 import 'package:kskfinance/Screens/Main/BulkInsert/IndividualCollectionScreen.dart';
 import 'package:kskfinance/Screens/TableDetailsScreen.dart';
+import 'package:kskfinance/Screens/Main/PartySearchScreen.dart';
 
 import 'package:kskfinance/Screens/UtilScreens/Backuppage.dart';
 import 'package:kskfinance/ContactUs.dart';
@@ -88,6 +89,12 @@ Widget buildDrawer(BuildContext context) {
                   Navigator.pop(context); // Close drawer first
                   _showCollectionTypeDialog(context);
                 },
+              ),
+              _buildDrawerItem(
+                context,
+                icon: Icons.search,
+                title: 'Search Parties',
+                onTap: () => _navigateTo(context, const PartySearchScreen()),
               ),
               _buildDrawerItem(
                 context,

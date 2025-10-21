@@ -996,6 +996,28 @@ class dbLending {
       return null;
     }
   }
+
+  // New function to get all parties with phone numbers for search screen
+  static Future<List<Map<String, dynamic>>> getAllPartiesWithBalance() async {
+    final db = await DatabaseHelper.getDatabase();
+    final result = await db.rawQuery('''
+      SELECT 
+        LenId,
+        LineName,
+        PartyName,
+        PartyPhnone,
+        PartyAdd,
+        amtgiven,
+        profit,
+        amtcollected,
+        status,
+        (amtgiven + profit - amtcollected) as balance
+      FROM Lending
+      WHERE status = 'active'
+      ORDER BY PartyName ASC
+    ''');
+    return result;
+  }
 }
 
 class CollectionDB {

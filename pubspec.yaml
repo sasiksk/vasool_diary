@@ -2,7 +2,7 @@ name: kskfinance  # Changed from vasool_diary to match new project
 description: "KSK Finance Management App"
 publish_to: 'none'
 
-version: 1.0.5+28  # Incremented version code
+version: 1.0.5+29  # Incremented version code
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
