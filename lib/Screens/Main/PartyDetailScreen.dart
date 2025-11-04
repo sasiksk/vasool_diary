@@ -9,12 +9,11 @@ import 'package:kskfinance/Screens/Main/LendingScreen.dart';
 
 import 'package:kskfinance/Utilities/EmptyCard1.dart';
 
-import 'package:kskfinance/Utilities/FloatingActionButtonWithText.dart';
-
 import 'package:kskfinance/Screens/Main/lendingScreen2.dart';
 import 'package:kskfinance/Screens/Main/linedetailScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:kskfinance/Utilities/premium_utils.dart';
 
 import '../../finance_provider.dart';
 import 'package:intl/intl.dart';
@@ -61,6 +60,77 @@ class PartyDetailScreen extends ConsumerStatefulWidget {
 
 class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
   bool _isWeeklyView = false; // Local toggle state for weekly/daily view
+
+  void _showActionMenuDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Choose Action'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.add, color: Colors.purple),
+                title: Text('You Gave'),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  final canProceed =
+                      await PremiumUtils.checkPremiumForOperation(
+                    context,
+                    operationName: 'You Gave',
+                  );
+                  if (canProceed) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LendingCombinedDetailsScreen2(),
+                      ),
+                    );
+                  }
+                },
+              ),
+              ListTile(
+                leading:
+                    Icon(Icons.picture_as_pdf_outlined, color: Colors.brown),
+                title: Text('Report'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ReportScreen2(lenId: ref.watch(lenIdProvider)!),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.add, color: Colors.green),
+                title: Text('You Got'),
+                onTap: () async {
+                  Navigator.of(context).pop();
+                  final canProceed =
+                      await PremiumUtils.checkPremiumForOperation(
+                    context,
+                    operationName: 'You Got',
+                  );
+                  if (canProceed) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CollectionScreen(),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   Widget _buildSummaryItem(String label, double amount, Color color,
       {String? additionalInfo}) {
@@ -826,37 +896,16 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
           const SizedBox(height: 10),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 6.0,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              FloatingActionButtonWithText(
-                label: 'partyDetailScreen.youGave'.tr(),
-                navigateTo: LendingCombinedDetailsScreen2(),
-                icon: Icons.add,
-                color: Colors.purple,
-              ),
-              FloatingActionButtonWithText(
-                label: 'partyDetailScreen.report'.tr(),
-                // navigateTo: ViewReportsPage(),
-                navigateTo: ReportScreen2(lenId: lenId),
-                icon: Icons.picture_as_pdf_outlined,
-                color: Colors.brown,
-              ),
-              FloatingActionButtonWithText(
-                label: 'partyDetailScreen.youGot'.tr(),
-                navigateTo: CollectionScreen(),
-                icon: Icons.add,
-                color: Colors.green,
-              ),
-            ],
-          ),
+      floatingActionButton: Container(
+        margin:
+            EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 16),
+        child: FloatingActionButton(
+          onPressed: _showActionMenuDialog,
+          backgroundColor: Colors.blue,
+          child: Icon(Icons.add, color: Colors.white),
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

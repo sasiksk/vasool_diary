@@ -60,8 +60,8 @@ Future<void> generateNewPdf(
   // Load both regular and Tamil fonts
   final ttf =
       pw.Font.ttf(await rootBundle.load("assets/fonts/Roboto-Regular.ttf"));
-  final tamilTtf = pw.Font.ttf(
-      await rootBundle.load("assets/fonts/NotoSansTamil-Regular.ttf"));
+  final tamilTtf =
+      pw.Font.ttf(await rootBundle.load("assets/fonts/Latha-Regular.ttf"));
 
   final today = DateTime.now();
   final formattedDate = "${today.day}-${today.month}-${today.year}";

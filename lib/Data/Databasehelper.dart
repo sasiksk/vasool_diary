@@ -107,7 +107,7 @@ class DatabaseHelper {
     // Open the database
     final db = await sql.openDatabase(
       path.join(dbPath, 'finance3.db'),
-      version: 1,
+      version: 2, // Increment version to trigger upgrade
       onCreate: (db, version) async {
         var batch = db.batch();
 
@@ -155,7 +155,36 @@ class DatabaseHelper {
   )
 ''');
 
+        // Create CashFlowTable
+        await db.execute('''
+  CREATE TABLE CashFlow (
+    Date TEXT PRIMARY KEY,
+    OpeningBalance REAL DEFAULT 0.0,
+    CashIn REAL DEFAULT 0.0,
+    CashOut REAL DEFAULT 0.0,
+    Profit REAL DEFAULT 0.0,
+    Expense REAL DEFAULT 0.0,
+    ClosingBalance REAL DEFAULT 0.0
+  )
+''');
+
         await batch.commit();
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          // Add CashFlow table for existing databases
+          await db.execute('''
+    CREATE TABLE IF NOT EXISTS CashFlow (
+      Date TEXT PRIMARY KEY,
+      OpeningBalance REAL DEFAULT 0.0,
+      CashIn REAL DEFAULT 0.0,
+      CashOut REAL DEFAULT 0.0,
+      Profit REAL DEFAULT 0.0,
+      Expense REAL DEFAULT 0.0,
+      ClosingBalance REAL DEFAULT 0.0
+    )
+  ''');
+        }
       },
     );
     return db;
@@ -1186,5 +1215,405 @@ class CollectionDB {
       whereArgs: [lenId],
       orderBy: 'Date Desc',
     );
+  }
+}
+
+//CASHFLOW OPERATIONS
+class dbCashFlow {
+  static Future<void> insertCashFlow({
+    required String date,
+    required double openingBalance,
+    required double cashIn,
+    required double cashOut,
+    required double profit,
+    required double expense,
+    required double closingBalance,
+  }) async {
+    final db = await DatabaseHelper.getDatabase();
+
+    await db.insert(
+      'CashFlow',
+      {
+        'Date': date,
+        'OpeningBalance': openingBalance,
+        'CashIn': cashIn,
+        'CashOut': cashOut,
+        'Profit': profit,
+        'Expense': expense,
+        'ClosingBalance': closingBalance,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<void> updateCashFlow({
+    required String date,
+    required Map<String, dynamic> updatedValues,
+  }) async {
+    final db = await DatabaseHelper.getDatabase();
+
+    await db.update(
+      'CashFlow',
+      updatedValues,
+      where: 'Date = ?',
+      whereArgs: [date],
+    );
+  }
+
+  static Future<Map<String, dynamic>?> getCashFlowByDate(String date) async {
+    final db = await DatabaseHelper.getDatabase();
+    final List<Map<String, dynamic>> result = await db.query(
+      'CashFlow',
+      where: 'Date = ?',
+      whereArgs: [date],
+    );
+
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+    return null;
+  }
+
+  static Future<List<Map<String, dynamic>>> getAllCashFlows() async {
+    final db = await DatabaseHelper.getDatabase();
+    return await db.query(
+      'CashFlow',
+      orderBy: 'Date DESC',
+    );
+  }
+
+  static Future<List<Map<String, dynamic>>> getCashFlowsByDateRange({
+    required String startDate,
+    required String endDate,
+  }) async {
+    final db = await DatabaseHelper.getDatabase();
+    return await db.query(
+      'CashFlow',
+      where: 'Date >= ? AND Date <= ?',
+      whereArgs: [startDate, endDate],
+      orderBy: 'Date ASC',
+    );
+  }
+
+  static Future<void> deleteCashFlow(String date) async {
+    final db = await DatabaseHelper.getDatabase();
+    await db.delete(
+      'CashFlow',
+      where: 'Date = ?',
+      whereArgs: [date],
+    );
+  }
+
+  static Future<double> getTotalCashIn({
+    String? startDate,
+    String? endDate,
+  }) async {
+    final db = await DatabaseHelper.getDatabase();
+    String query = 'SELECT SUM(CashIn) as totalCashIn FROM CashFlow';
+    List<dynamic> args = [];
+
+    if (startDate != null && endDate != null) {
+      query += ' WHERE Date >= ? AND Date <= ?';
+      args = [startDate, endDate];
+    }
+
+    final List<Map<String, dynamic>> result = await db.rawQuery(query, args);
+    return (result.first['totalCashIn'] ?? 0.0) as double;
+  }
+
+  static Future<double> getTotalCashOut({
+    String? startDate,
+    String? endDate,
+  }) async {
+    final db = await DatabaseHelper.getDatabase();
+    String query = 'SELECT SUM(CashOut) as totalCashOut FROM CashFlow';
+    List<dynamic> args = [];
+
+    if (startDate != null && endDate != null) {
+      query += ' WHERE Date >= ? AND Date <= ?';
+      args = [startDate, endDate];
+    }
+
+    final List<Map<String, dynamic>> result = await db.rawQuery(query, args);
+    return (result.first['totalCashOut'] ?? 0.0) as double;
+  }
+
+  static Future<double> getTotalProfit({
+    String? startDate,
+    String? endDate,
+  }) async {
+    final db = await DatabaseHelper.getDatabase();
+    String query = 'SELECT SUM(Profit) as totalProfit FROM CashFlow';
+    List<dynamic> args = [];
+
+    if (startDate != null && endDate != null) {
+      query += ' WHERE Date >= ? AND Date <= ?';
+      args = [startDate, endDate];
+    }
+
+    final List<Map<String, dynamic>> result = await db.rawQuery(query, args);
+    return (result.first['totalProfit'] ?? 0.0) as double;
+  }
+
+  static Future<double> getTotalExpense({
+    String? startDate,
+    String? endDate,
+  }) async {
+    final db = await DatabaseHelper.getDatabase();
+    String query = 'SELECT SUM(Expense) as totalExpense FROM CashFlow';
+    List<dynamic> args = [];
+
+    if (startDate != null && endDate != null) {
+      query += ' WHERE Date >= ? AND Date <= ?';
+      args = [startDate, endDate];
+    }
+
+    final List<Map<String, dynamic>> result = await db.rawQuery(query, args);
+    return (result.first['totalExpense'] ?? 0.0) as double;
+  }
+
+  static Future<Map<String, double>> getCashFlowSummary({
+    String? startDate,
+    String? endDate,
+  }) async {
+    final db = await DatabaseHelper.getDatabase();
+    String query = '''
+      SELECT 
+        SUM(CashIn) as totalCashIn,
+        SUM(CashOut) as totalCashOut,
+        SUM(Profit) as totalProfit,
+        SUM(Expense) as totalExpense,
+        AVG(OpeningBalance) as avgOpeningBalance,
+        AVG(ClosingBalance) as avgClosingBalance
+      FROM CashFlow
+    ''';
+    List<dynamic> args = [];
+
+    if (startDate != null && endDate != null) {
+      query += ' WHERE Date >= ? AND Date <= ?';
+      args = [startDate, endDate];
+    }
+
+    final List<Map<String, dynamic>> result = await db.rawQuery(query, args);
+
+    if (result.isNotEmpty) {
+      return {
+        'totalCashIn': (result.first['totalCashIn'] ?? 0.0) as double,
+        'totalCashOut': (result.first['totalCashOut'] ?? 0.0) as double,
+        'totalProfit': (result.first['totalProfit'] ?? 0.0) as double,
+        'totalExpense': (result.first['totalExpense'] ?? 0.0) as double,
+        'avgOpeningBalance':
+            (result.first['avgOpeningBalance'] ?? 0.0) as double,
+        'avgClosingBalance':
+            (result.first['avgClosingBalance'] ?? 0.0) as double,
+      };
+    }
+
+    return {
+      'totalCashIn': 0.0,
+      'totalCashOut': 0.0,
+      'totalProfit': 0.0,
+      'totalExpense': 0.0,
+      'avgOpeningBalance': 0.0,
+      'avgClosingBalance': 0.0,
+    };
+  }
+}
+
+// CashFlow Database Helper Class
+class CashFlowDatabaseHelper {
+  static Future<List<Map<String, dynamic>>> getAllCashFlow() async {
+    final db = await DatabaseHelper.getDatabase();
+
+    try {
+      final List<Map<String, dynamic>> result = await db.query(
+        'CashFlow',
+        orderBy: 'Date DESC',
+      );
+      return result;
+    } catch (e) {
+      print('Error fetching all cash flow data: $e');
+      return [];
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> getCashFlowByDateRange(
+    DateTime fromDate,
+    DateTime toDate,
+  ) async {
+    final db = await DatabaseHelper.getDatabase();
+
+    try {
+      final String fromDateStr = fromDate.toIso8601String().split('T')[0];
+      final String toDateStr = toDate.toIso8601String().split('T')[0];
+
+      final List<Map<String, dynamic>> result = await db.query(
+        'CashFlow',
+        where: 'Date >= ? AND Date <= ?',
+        whereArgs: [fromDateStr, toDateStr],
+        orderBy: 'Date DESC',
+      );
+      return result;
+    } catch (e) {
+      print('Error fetching cash flow data by date range: $e');
+      return [];
+    }
+  }
+
+  static Future<Map<String, dynamic>?> getCashFlowByDate(String date) async {
+    final db = await DatabaseHelper.getDatabase();
+
+    try {
+      final List<Map<String, dynamic>> result = await db.query(
+        'CashFlow',
+        where: 'Date = ?',
+        whereArgs: [date],
+        limit: 1,
+      );
+
+      if (result.isNotEmpty) {
+        return result.first;
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching cash flow data by date: $e');
+      return null;
+    }
+  }
+
+  static Future<int> insertCashFlow({
+    required String date,
+    required double openingBalance,
+    required double cashIn,
+    required double cashOut,
+    required double profit,
+    required double expense,
+    required double closingBalance,
+  }) async {
+    final db = await DatabaseHelper.getDatabase();
+
+    try {
+      final int id = await db.insert(
+        'CashFlow',
+        {
+          'Date': date,
+          'OpeningBalance': openingBalance,
+          'CashIn': cashIn,
+          'CashOut': cashOut,
+          'Profit': profit,
+          'Expense': expense,
+          'ClosingBalance': closingBalance,
+        },
+        conflictAlgorithm: sql.ConflictAlgorithm.replace,
+      );
+      return id;
+    } catch (e) {
+      print('Error inserting cash flow data: $e');
+      return -1;
+    }
+  }
+
+  static Future<int> updateCashFlow({
+    required String date,
+    required double openingBalance,
+    required double cashIn,
+    required double cashOut,
+    required double profit,
+    required double expense,
+    required double closingBalance,
+  }) async {
+    final db = await DatabaseHelper.getDatabase();
+
+    try {
+      final int count = await db.update(
+        'CashFlow',
+        {
+          'OpeningBalance': openingBalance,
+          'CashIn': cashIn,
+          'CashOut': cashOut,
+          'Profit': profit,
+          'Expense': expense,
+          'ClosingBalance': closingBalance,
+        },
+        where: 'Date = ?',
+        whereArgs: [date],
+      );
+      return count;
+    } catch (e) {
+      print('Error updating cash flow data: $e');
+      return 0;
+    }
+  }
+
+  static Future<int> deleteCashFlow(String date) async {
+    final db = await DatabaseHelper.getDatabase();
+
+    try {
+      final int count = await db.delete(
+        'CashFlow',
+        where: 'Date = ?',
+        whereArgs: [date],
+      );
+      return count;
+    } catch (e) {
+      print('Error deleting cash flow data: $e');
+      return 0;
+    }
+  }
+
+  static Future<Map<String, double>> getCashFlowSummaryByDateRange(
+    DateTime fromDate,
+    DateTime toDate,
+  ) async {
+    final db = await DatabaseHelper.getDatabase();
+
+    try {
+      final String fromDateStr = fromDate.toIso8601String().split('T')[0];
+      final String toDateStr = toDate.toIso8601String().split('T')[0];
+
+      final List<Map<String, dynamic>> result = await db.rawQuery('''
+        SELECT 
+          SUM(OpeningBalance) as totalOpeningBalance,
+          SUM(CashIn) as totalCashIn,
+          SUM(CashOut) as totalCashOut,
+          SUM(Profit) as totalProfit,
+          SUM(Expense) as totalExpense,
+          SUM(ClosingBalance) as totalClosingBalance
+        FROM CashFlow
+        WHERE Date >= ? AND Date <= ?
+      ''', [fromDateStr, toDateStr]);
+
+      if (result.isNotEmpty) {
+        return {
+          'totalOpeningBalance':
+              (result.first['totalOpeningBalance'] ?? 0.0) as double,
+          'totalCashIn': (result.first['totalCashIn'] ?? 0.0) as double,
+          'totalCashOut': (result.first['totalCashOut'] ?? 0.0) as double,
+          'totalProfit': (result.first['totalProfit'] ?? 0.0) as double,
+          'totalExpense': (result.first['totalExpense'] ?? 0.0) as double,
+          'totalClosingBalance':
+              (result.first['totalClosingBalance'] ?? 0.0) as double,
+        };
+      }
+
+      return {
+        'totalOpeningBalance': 0.0,
+        'totalCashIn': 0.0,
+        'totalCashOut': 0.0,
+        'totalProfit': 0.0,
+        'totalExpense': 0.0,
+        'totalClosingBalance': 0.0,
+      };
+    } catch (e) {
+      print('Error fetching cash flow summary: $e');
+      return {
+        'totalOpeningBalance': 0.0,
+        'totalCashIn': 0.0,
+        'totalCashOut': 0.0,
+        'totalProfit': 0.0,
+        'totalExpense': 0.0,
+        'totalClosingBalance': 0.0,
+      };
+    }
   }
 }

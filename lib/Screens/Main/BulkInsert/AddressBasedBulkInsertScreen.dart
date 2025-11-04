@@ -6,6 +6,7 @@ import 'package:kskfinance/Screens/Main/CollectionScreen.dart';
 import 'package:intl/intl.dart';
 import 'package:kskfinance/Sms.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kskfinance/Utilities/premium_utils.dart';
 
 class AddressBasedBulkInsertScreen extends StatefulWidget {
   const AddressBasedBulkInsertScreen({super.key});
@@ -190,7 +191,13 @@ class _AddressBasedBulkInsertScreenState
   }
 
   // Reused processing methods from EnhancedBulkInsertScreen
-  void _processBulkUpdate() {
+  void _processBulkUpdate() async {
+    // Check premium access before processing
+    if (!await PremiumUtils.checkPremiumForOperation(context,
+        operationName: 'Bulk Update and SMS')) {
+      return;
+    }
+
     List<Map<String, dynamic>> selectedEntries = [];
     double totalAmount = 0.0;
 

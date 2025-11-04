@@ -5,6 +5,7 @@ import 'package:kskfinance/Screens/Main/OnboardingScreen.dart';
 import 'package:kskfinance/Screens/Main/home_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kskfinance/Services/premium_service.dart';
 
 final ThemeData appTheme = ThemeData(
   scaffoldBackgroundColor: const Color.fromARGB(255, 243, 242, 241),
@@ -75,6 +76,10 @@ void main() async {
 
   // Initialize Easy Localization
   await EasyLocalization.ensureInitialized();
+
+  // Initialize Premium Service
+  final premiumService = PremiumService();
+  await premiumService.initialize();
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;

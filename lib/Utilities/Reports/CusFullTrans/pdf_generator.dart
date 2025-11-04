@@ -54,8 +54,7 @@ Future<void> generatePdf(
 
   // Load custom fonts from assets
   final fontData = await rootBundle.load("assets/fonts/Roboto-Regular.ttf");
-  final tamilFontData =
-      await rootBundle.load("assets/fonts/NotoSansTamil-Regular.ttf");
+  final tamilFontData = await rootBundle.load("assets/fonts/Latha-Regular.ttf");
   final ttf = pw.Font.ttf(fontData);
   final tamilTtf = pw.Font.ttf(tamilFontData);
 

@@ -9,7 +9,7 @@ class TableDetailsScreen extends StatefulWidget {
 }
 
 class _TableDetailsScreenState extends State<TableDetailsScreen> {
-  List<String> _tableNames = ['Lending', 'Collection', 'Line'];
+  List<String> _tableNames = ['Lending', 'Collection', 'Line', 'CashFlow'];
   String? _selectedTableName;
   List<Map<String, dynamic>> _tableDetails = [];
 

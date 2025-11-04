@@ -2,7 +2,7 @@ name: kskfinance  # Changed from vasool_diary to match new project
 description: "KSK Finance Management App"
 publish_to: 'none'
 
-version: 1.0.6+39  # Android Auto Backup Release
+version: 1.0.6+40  # Android Auto Backup Release
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -62,6 +62,9 @@ dependencies:
   
   # Localization
   easy_localization: ^3.0.3
+  
+  # In-App Purchases
+  in_app_purchase: ^3.2.0
 
 dev_dependencies:
   flutter_test:

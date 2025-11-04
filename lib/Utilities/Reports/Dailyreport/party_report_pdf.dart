@@ -26,8 +26,8 @@ Future<void> generatePartyReportPdf(
   // Load both regular and Tamil fonts
   final regularFont =
       pw.Font.ttf(await rootBundle.load("assets/fonts/Roboto-Regular.ttf"));
-  final tamilFont = pw.Font.ttf(
-      await rootBundle.load("assets/fonts/NotoSansTamil-Regular.ttf"));
+  final tamilFont =
+      pw.Font.ttf(await rootBundle.load("assets/fonts/Latha-Regular.ttf"));
 
   pdf.addPage(
     pw.MultiPage(
@@ -93,15 +93,31 @@ Future<void> generatePartyReportPdf(
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text(
-                      'Party: $partyName',
-                      style: pw.TextStyle(
-                        fontSize: 13,
-                        fontWeight: pw.FontWeight.bold,
-                        color: PdfColors.black,
-                        font: getAppropriateFont(
-                            partyName, regularFont, tamilFont),
-                      ),
+                    pw.Row(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          'Party:',
+                          style: pw.TextStyle(
+                            fontSize: 13,
+                            fontWeight: pw.FontWeight.bold,
+                            color: PdfColors.black,
+                          ),
+                        ),
+                        pw.SizedBox(width: 6),
+                        pw.Expanded(
+                          child: pw.Text(
+                            partyName,
+                            style: pw.TextStyle(
+                              fontSize: 13,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColors.black,
+                              font: getAppropriateFont(
+                                  partyName, regularFont, tamilFont),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     pw.SizedBox(height: 6),
                     pw.Row(

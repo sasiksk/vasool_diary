@@ -5,14 +5,18 @@ import 'package:kskfinance/ContactUs.dart';
 import 'package:kskfinance/Screens/Main/BulkInsert/AddressBasedBulkInsertScreen.dart';
 import 'package:kskfinance/Screens/Main/BulkInsert/EnhancedBulkInsertScreen.dart';
 import 'package:kskfinance/Screens/Main/OnboardingScreen.dart';
+import 'package:kskfinance/Screens/Main/cashflowscreen.dart';
 import 'package:kskfinance/Screens/TableDetailsScreen.dart';
 import 'package:kskfinance/Screens/Main/PartySearchScreen.dart';
 
 import 'package:kskfinance/Screens/UtilScreens/Backuppage.dart';
+import 'package:kskfinance/Screens/premium_screen.dart';
+import 'package:kskfinance/Screens/subscription_simulation_page.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
 import 'package:kskfinance/Screens/UtilScreens/Restore.dart';
 import 'package:kskfinance/Utilities/Reports/CustomerReportScreen.dart';
 import 'package:kskfinance/Screens/Main/home_screen.dart';
+import 'package:kskfinance/Services/premium_service.dart';
 import 'package:kskfinance/Utilities/app_rating_share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -124,6 +128,39 @@ Widget buildDrawer(BuildContext context) {
                 title: 'navigation.reports'.tr(),
                 onTap: () => _navigateTo(context, const ViewReportsPage()),
               ),
+              _buildDrawerItem(
+                context,
+                icon: Icons.picture_as_pdf,
+                title: 'navigation.reports'.tr(),
+                onTap: () => _navigateTo(context, const CashFlowScreen()),
+              ),
+              const Divider(thickness: 1),
+
+              // Premium/Subscription Management
+              FutureBuilder<bool>(
+                future: _getHasPremiumAccess(),
+                builder: (context, snapshot) {
+                  final hasPremium = snapshot.data ?? false;
+
+                  return _buildDrawerItem(
+                    context,
+                    icon: hasPremium ? Icons.star : Icons.star_outline,
+                    title: hasPremium ? 'Premium Active' : 'Upgrade to Premium',
+                    onTap: () => _navigateTo(context, const PremiumScreen()),
+                  );
+                },
+              ),
+
+              // Debug: Premium Simulation (only in debug mode)
+              if (const bool.fromEnvironment('dart.vm.product') == false)
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.science,
+                  title: '🔬 Premium Simulation',
+                  onTap: () =>
+                      _navigateTo(context, const SubscriptionSimulationPage()),
+                ),
+
               const Divider(thickness: 1),
 
               // App Rating & Sharing Section
@@ -420,5 +457,17 @@ Future<void> _clearRegistrationData() async {
     await prefs.remove('deviceId');
   } catch (e) {
     print('Error clearing registration data: $e');
+  }
+}
+
+// Helper function for premium status
+Future<bool> _getHasPremiumAccess() async {
+  try {
+    final premiumService = PremiumService();
+    await premiumService.initialize();
+    return premiumService.hasPremiumAccess;
+  } catch (e) {
+    print('Error getting premium access: $e');
+    return false;
   }
 }
