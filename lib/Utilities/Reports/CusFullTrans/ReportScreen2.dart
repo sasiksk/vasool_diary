@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
 import 'package:kskfinance/Utilities/CustomDatePicker.dart';
-import 'package:intl/intl.dart';
 import 'package:kskfinance/Utilities/Reports/CusFullTrans/pdf_generator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kskfinance/finance_provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ReportScreen2 extends StatefulWidget {
   final int? lenId; // Make lenId optional
@@ -45,7 +45,7 @@ class _ReportScreen2State extends State<ReportScreen2> {
       // Validate the dates
       if (endDate.isBefore(startDate)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('End date cannot be before start date')),
+          SnackBar(content: Text('reports.endDateBeforeStart'.tr())),
         );
         return;
       }
@@ -53,7 +53,7 @@ class _ReportScreen2State extends State<ReportScreen2> {
       if (startDate.isAfter(DateTime.now()) ||
           endDate.isAfter(DateTime.now())) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Dates cannot go beyond today')),
+          SnackBar(content: Text('reports.datesCannotBeFuture'.tr())),
         );
         return;
       }
@@ -92,7 +92,7 @@ class _ReportScreen2State extends State<ReportScreen2> {
         // Fetch party name
         String partyName =
             await DatabaseHelper.getPartyNameByLenId(entry['LenId']) ??
-                'Unknown';
+                'reports.unknown'.tr();
 
         // Create PdfEntry
         PdfEntry pdfEntry = PdfEntry(
@@ -123,7 +123,7 @@ class _ReportScreen2State extends State<ReportScreen2> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Download Options"),
+          title: Text('reports.downloadOptions'.tr()),
           content: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -134,10 +134,10 @@ class _ReportScreen2State extends State<ReportScreen2> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
+                children: [
                   Text(
-                    "Choose how you want to group the report:",
-                    style: TextStyle(fontSize: 16),
+                    'reports.chooseGrouping'.tr(),
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ],
               ),
@@ -149,14 +149,14 @@ class _ReportScreen2State extends State<ReportScreen2> {
                 Navigator.of(context).pop(); // Close the dialog
                 _generateDateWisePdf(ref); // Generate Date-wise PDF
               },
-              child: const Text("Date-wise"),
+              child: Text('reports.dateWise'.tr()),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
                 _generatePartyWisePdf(ref); // Generate Party-wise PDF
               },
-              child: const Text("Party-wise"),
+              child: Text('reports.partyWise'.tr()),
             ),
           ],
         );
@@ -212,7 +212,7 @@ class _ReportScreen2State extends State<ReportScreen2> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('View Report'),
+        title: Text('reports.viewReport'.tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -230,8 +230,8 @@ class _ReportScreen2State extends State<ReportScreen2> {
                 Expanded(
                   child: CustomDatePicker(
                     controller: _startDateController,
-                    labelText: 'Start Date',
-                    hintText: 'Pick a start date',
+                    labelText: 'reports.startDate'.tr(),
+                    hintText: 'reports.pickStartDate'.tr(),
                     lastDate: DateTime.now(),
                   ),
                 ),
@@ -239,8 +239,8 @@ class _ReportScreen2State extends State<ReportScreen2> {
                 Expanded(
                   child: CustomDatePicker(
                     controller: _endDateController,
-                    labelText: 'End Date',
-                    hintText: 'Pick an end date',
+                    labelText: 'reports.endDate'.tr(),
+                    hintText: 'reports.pickEndDate'.tr(),
                     lastDate: DateTime.now(),
                   ),
                 ),
@@ -258,14 +258,29 @@ class _ReportScreen2State extends State<ReportScreen2> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Show: ', style: TextStyle(fontSize: 15)),
+                    Text('reports.show'.tr(),
+                        style: const TextStyle(fontSize: 15)),
                     const SizedBox(width: 8),
                     DropdownButton<String>(
                       value: _selectedType,
                       items: _entryTypes.map((type) {
+                        String translatedType;
+                        switch (type) {
+                          case 'All':
+                            translatedType = 'reports.all'.tr();
+                            break;
+                          case 'Debit':
+                            translatedType = 'reports.debit'.tr();
+                            break;
+                          case 'Credit':
+                            translatedType = 'reports.credit'.tr();
+                            break;
+                          default:
+                            translatedType = type;
+                        }
                         return DropdownMenuItem<String>(
                           value: type,
-                          child: Text(type),
+                          child: Text(translatedType),
                         );
                       }).toList(),
                       onChanged: (value) {
@@ -281,9 +296,9 @@ class _ReportScreen2State extends State<ReportScreen2> {
                         onPressed: _fetchEntries,
                         icon: const Icon(Icons.check_circle,
                             color: Colors.white, size: 20),
-                        label: const Text('OK',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 15)),
+                        label: Text('actions.ok'.tr(),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 15)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           padding: const EdgeInsets.symmetric(
@@ -313,24 +328,24 @@ class _ReportScreen2State extends State<ReportScreen2> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Total',
-                          style: TextStyle(color: Colors.white)),
-                      Text('${_entries.length} Entries',
+                      Text('reports.total'.tr(),
+                          style: const TextStyle(color: Colors.white)),
+                      Text('${_entries.length} ${'reports.entries'.tr()}',
                           style: const TextStyle(color: Colors.white)),
                     ],
                   ),
                   Column(
                     children: [
-                      const Text('You Gave',
-                          style: TextStyle(color: Colors.yellow)),
+                      Text('reports.youGave'.tr(),
+                          style: const TextStyle(color: Colors.yellow)),
                       Text('₹ $_totalYouGave',
                           style: const TextStyle(color: Colors.yellow)),
                     ],
                   ),
                   Column(
                     children: [
-                      const Text('You Got',
-                          style: TextStyle(color: Colors.white)),
+                      Text('reports.youGot'.tr(),
+                          style: const TextStyle(color: Colors.white)),
                       Text('₹ $_totalYouGot',
                           style: const TextStyle(color: Colors.white)),
                     ],
@@ -343,10 +358,11 @@ class _ReportScreen2State extends State<ReportScreen2> {
             // Entries List
             Expanded(
               child: _entries.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'No entries found',
-                        style: TextStyle(fontSize: 15, color: Colors.grey),
+                        'reports.noEntriesFound'.tr(),
+                        style:
+                            const TextStyle(fontSize: 15, color: Colors.grey),
                       ),
                     )
                   : ListView.separated(
@@ -424,12 +440,11 @@ class _ReportScreen2State extends State<ReportScreen2> {
             SafeArea(
               child: Consumer(
                 builder: (context, ref, child) {
-                  final finnaame = ref.watch(financeProvider);
                   return Center(
                     child: ElevatedButton.icon(
                       onPressed: () => _showDownloadOptions(context, ref),
                       icon: const Icon(Icons.picture_as_pdf),
-                      label: const Text('DOWNLOAD'),
+                      label: Text('actions.download'.tr()),
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
                         backgroundColor: Colors.blue,

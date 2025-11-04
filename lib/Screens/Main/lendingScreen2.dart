@@ -2,12 +2,12 @@ import 'package:kskfinance/Sms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import 'package:kskfinance/Utilities/AppBar.dart';
 import 'package:kskfinance/Utilities/CustomDatePicker.dart';
 import 'package:kskfinance/Utilities/CustomTextField.dart';
 import 'package:kskfinance/finance_provider.dart';
-import 'package:intl/intl.dart';
 
 class LendingCombinedDetailsScreen2 extends ConsumerWidget {
   LendingCombinedDetailsScreen2({
@@ -73,7 +73,7 @@ class LendingCombinedDetailsScreen2 extends ConsumerWidget {
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Lending details updated successfully')),
+          SnackBar(content: Text('lendingScreen.lendingUpdatedSuccess'.tr())),
         );
 
         /*Navigator.pushReplacement(
@@ -83,7 +83,7 @@ class LendingCombinedDetailsScreen2 extends ConsumerWidget {
         Navigator.pop(context);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating lending details: $e')),
+          SnackBar(content: Text('${'lendingScreen.updateError'.tr()}: $e')),
         );
       }
     }
@@ -144,29 +144,29 @@ $financeName
           // Send SMS
           await sendSms(phoneNumber, message);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('SMS sent successfully')),
+            SnackBar(content: Text('lendingScreen.smsSentSuccessfully'.tr())),
           );
         } else if (smsFlag == 0) {
           // SMS flag is not set, skip sending SMS
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('SMS not enabled for this party')),
+            SnackBar(content: Text('lendingScreen.smsNotEnabled'.tr())),
           );
         } else {
           // Handle case where phone number is empty
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Phone number not available')),
+            SnackBar(content: Text('lendingScreen.phoneNotAvailable'.tr())),
           );
         }
       } else {
         // Handle case where party details are not found
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Party details not found')),
+          SnackBar(content: Text('lendingScreen.partyDetailsNotFound'.tr())),
         );
       }
     } catch (e) {
       // Handle errors
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send SMS: $e')),
+        SnackBar(content: Text('${'lendingScreen.smsFailedToSend'.tr()}: $e')),
       );
     }
   }
@@ -179,7 +179,7 @@ $financeName
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Lending to - ${partyName ?? ''}",
+        title: "${'lendingScreen.title'.tr()} - ${partyName ?? ''}",
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -190,9 +190,9 @@ $financeName
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Section Header
-                const Text(
-                  "Financial Details",
-                  style: TextStyle(
+                Text(
+                  'lendingScreen.details'.tr(),
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.blueAccent,
@@ -213,15 +213,15 @@ $financeName
                         // Amount Given Field
                         TextFormField(
                           controller: _amtGivenController,
-                          decoration: const InputDecoration(
-                            labelText: "Amount Given",
-                            hintText: "Enter the amount given",
-                            border: OutlineInputBorder(),
+                          decoration: InputDecoration(
+                            labelText: 'lendingScreen.amountGiven'.tr(),
+                            hintText: 'lendingScreen.enterAmountGiven'.tr(),
+                            border: const OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.number,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter the amount given';
+                              return 'lendingScreen.amountGivenRequired'.tr();
                             }
                             return null;
                           },
@@ -235,15 +235,15 @@ $financeName
                         // Profit Field
                         TextFormField(
                           controller: _profitController,
-                          decoration: const InputDecoration(
-                            labelText: "Profit",
-                            hintText: "Enter the profit",
-                            border: OutlineInputBorder(),
+                          decoration: InputDecoration(
+                            labelText: 'lendingScreen.profit'.tr(),
+                            hintText: 'lendingScreen.enterProfit'.tr(),
+                            border: const OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.number,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter the profit';
+                              return 'lendingScreen.profitRequired'.tr();
                             }
                             return null;
                           },
@@ -257,8 +257,8 @@ $financeName
                         // Total Field
                         CustomTextField(
                           controller: _totalController,
-                          labelText: "Total",
-                          hintText: "Calculated total",
+                          labelText: 'lendingScreen.total'.tr(),
+                          hintText: 'lendingScreen.enterTotal'.tr(),
                           readOnly: true,
                         ),
                         const SizedBox(height: 10),
@@ -269,8 +269,8 @@ $financeName
                             Expanded(
                               child: CustomDatePicker(
                                 controller: _lentDateController,
-                                labelText: "Lent Date",
-                                hintText: "Pick a lent date",
+                                labelText: 'lendingScreen.lentDate'.tr(),
+                                hintText: 'lendingScreen.pickLentDate'.tr(),
                                 firstDate: DateTime(2000),
                                 lastDate: DateTime.now(),
                               ),
@@ -279,15 +279,15 @@ $financeName
                             Expanded(
                               child: TextFormField(
                                 controller: _dueDaysController,
-                                decoration: const InputDecoration(
-                                  labelText: "Due Days",
-                                  hintText: "Enter the due days",
-                                  border: OutlineInputBorder(),
+                                decoration: InputDecoration(
+                                  labelText: 'lendingScreen.dueDays'.tr(),
+                                  hintText: 'lendingScreen.enterDueDays'.tr(),
+                                  border: const OutlineInputBorder(),
                                 ),
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Please enter the due days';
+                                    return 'lendingScreen.dueDaysRequired'.tr();
                                   }
                                   return null;
                                 },
@@ -306,8 +306,8 @@ $financeName
                         // Due Date Field
                         CustomTextField(
                           controller: _dueDateController,
-                          labelText: "Due Date",
-                          hintText: "Calculated due date",
+                          labelText: 'lendingScreen.dueDate'.tr(),
+                          hintText: 'lendingScreen.calculatedDueDate'.tr(),
                           readOnly: true,
                         ),
                       ],
@@ -331,7 +331,7 @@ $financeName
                         _totalController.clear();
                       },
                       icon: const Icon(Icons.refresh),
-                      label: const Text("Reset"),
+                      label: Text('lendingScreen.reset'.tr()),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orangeAccent,
                         padding: const EdgeInsets.symmetric(
@@ -343,7 +343,7 @@ $financeName
                         Navigator.of(context).pop();
                       },
                       icon: const Icon(Icons.cancel),
-                      label: const Text("Cancel"),
+                      label: Text('lendingScreen.cancel'.tr()),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.redAccent.shade100,
                         padding: const EdgeInsets.symmetric(
@@ -370,7 +370,9 @@ $financeName
 
                               // Show success SnackBar
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Form Submitted')),
+                                SnackBar(
+                                    content: Text(
+                                        'lendingScreen.formSubmitted'.tr())),
                               );
 
                               // Send SMS
@@ -387,22 +389,24 @@ $financeName
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                SnackBar(
                                     content: Text(
-                                        'Error: Cannot lend amount to active state party')),
+                                        'lendingScreen.cannotLendToActive'
+                                            .tr())),
                               );
                             }
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Error: LenId is null')),
+                              SnackBar(
+                                  content:
+                                      Text('lendingScreen.lenIdError'.tr())),
                             );
                           }
                         });
                       }
                     },
                     icon: const Icon(Icons.check),
-                    label: const Text("Submit"),
+                    label: Text('lendingScreen.submitLending'.tr()),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.greenAccent,
                       padding: const EdgeInsets.symmetric(

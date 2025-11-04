@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
 import 'package:kskfinance/Screens/Main/LineScreen.dart';
 import 'package:kskfinance/Utilities/AppBar.dart';
 import 'package:kskfinance/Utilities/drawer.dart';
 import 'package:kskfinance/Utilities/FloatingActionButtonWithText.dart';
 import 'package:kskfinance/Widgets/HomeScreenComponents/home_screen_components.dart';
+
 import '../../finance_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -46,11 +48,10 @@ class _ModernDashboardState extends ConsumerState<HomeScreen>
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.2),
-      end: Offset.zero,
-    ).animate(
-        CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
 
     loadData();
     _animationController.forward();
@@ -155,18 +156,18 @@ class _ModernDashboardState extends ConsumerState<HomeScreen>
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Update Your Name'),
+          title: Text('home.updateYourName'.tr()),
           content: TextField(
             controller: financeNameController,
-            decoration: const InputDecoration(hintText: 'Enter Your Name'),
+            decoration: InputDecoration(hintText: 'home.enterYourName'.tr()),
           ),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
+              child: Text('actions.cancel'.tr()),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: const Text('Update'),
+              child: Text('actions.update'.tr()),
               onPressed: () async {
                 final newFinanceName = financeNameController.text;
                 if (newFinanceName.isNotEmpty) {
@@ -183,6 +184,37 @@ class _ModernDashboardState extends ConsumerState<HomeScreen>
     );
   }
 
+  Future<void> _toggleLanguage(BuildContext context) async {
+    try {
+      // Toggle between Tamil and English
+      if (context.locale.languageCode == 'ta') {
+        await context.setLocale(const Locale('en'));
+      } else {
+        await context.setLocale(const Locale('ta'));
+      }
+
+      // Wait a bit for the change to take effect
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      if (mounted) {
+        // Show feedback in the new language
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.locale.languageCode == 'ta'
+                  ? 'மொழி தமிழுக்கு மாற்றப்பட்டது'
+                  : 'Language changed to English',
+            ),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error changing language: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // Required for AutomaticKeepAliveClientMixin
@@ -193,6 +225,46 @@ class _ModernDashboardState extends ConsumerState<HomeScreen>
       appBar: CustomAppBar(
         title: financeName,
         actions: [
+          // Language Switcher for Home Screen
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: GestureDetector(
+              onTap: () => _toggleLanguage(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white.withOpacity(0.7)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.language, color: Colors.teal.shade700, size: 18),
+                    const SizedBox(width: 4),
+                    Text(
+                      context.locale.languageCode == 'ta' ? 'தமிழ்' : 'English',
+                      style: TextStyle(
+                        color: Colors.teal.shade700,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.edit_note_outlined),
             onPressed: () => _showUpdateFinanceNameDialog(context),
@@ -242,9 +314,9 @@ class _ModernDashboardState extends ConsumerState<HomeScreen>
           ),
         ),
       ),
-      floatingActionButton: const FloatingActionButtonWithText(
-        label: 'Add New Line',
-        navigateTo: LineScreen(),
+      floatingActionButton: FloatingActionButtonWithText(
+        label: 'home.addNewLine'.tr(),
+        navigateTo: const LineScreen(),
         icon: Icons.add,
       ),
     );

@@ -1,10 +1,9 @@
-//import 'package:kskfinance/Views/HomeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:kskfinance/Screens/Main/IntroductionDcreen.dart';
+import 'package:kskfinance/Screens/Main/OnboardingScreen.dart';
 import 'package:kskfinance/Screens/Main/home_screen.dart';
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 final ThemeData appTheme = ThemeData(
@@ -73,13 +72,25 @@ final ThemeData appTheme = ThemeData(
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  //await Firebase.initializeApp();
+
+  // Initialize Easy Localization
+  await EasyLocalization.ensureInitialized();
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
 
   runApp(
-    ProviderScope(
-      child: MyApp(isFirstLaunch: isFirstLaunch),
+    EasyLocalization(
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ta'),
+      ],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      startLocale: const Locale('ta'), // Default to Tamil
+      child: ProviderScope(
+        child: MyApp(isFirstLaunch: isFirstLaunch),
+      ),
     ),
   );
 }
@@ -92,8 +103,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'app.title'.tr(),
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       theme: appTheme,
-      home: isFirstLaunch ? const IntroductionScreen() : const HomeScreen(),
+      home: isFirstLaunch ? const OnboardingScreen() : const HomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

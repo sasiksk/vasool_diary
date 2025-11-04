@@ -1,13 +1,12 @@
-import 'package:kskfinance/Sms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 import 'package:kskfinance/Utilities/AppBar.dart';
 import 'package:kskfinance/Utilities/CustomDatePicker.dart';
 import 'package:kskfinance/Utilities/CustomTextField.dart';
 import 'package:kskfinance/finance_provider.dart';
-import 'package:intl/intl.dart';
 
 class LendingCombinedDetailsScreen extends ConsumerWidget {
   final double preloadedamtgiven;
@@ -33,8 +32,13 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
   final TextEditingController _dueDaysController = TextEditingController();
   final TextEditingController _dueDateController = TextEditingController();
 
-  void _updateLending(BuildContext context, String lineName, String partyName,
-      int lentid, double preloadedamtgiven) async {
+  void _updateLending(
+    BuildContext context,
+    String lineName,
+    String partyName,
+    int lentid,
+    double preloadedamtgiven,
+  ) async {
     if (_formKey.currentState?.validate() == true) {
       try {
         final double amtGiven = double.parse(_amtGivenController.text);
@@ -50,8 +54,9 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
             'LenId': lentid,
             'amtgiven': amtGiven,
             'profit': profit,
-            'Lentdate': DateFormat('yyyy-MM-dd').format(
-                DateFormat('dd-MM-yyyy').parse(_lentDateController.text)),
+            'Lentdate': DateFormat(
+              'yyyy-MM-dd',
+            ).format(DateFormat('dd-MM-yyyy').parse(_lentDateController.text)),
             'duedays': int.parse(_dueDaysController.text),
             'status': 'active',
           };
@@ -59,8 +64,9 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
           await CollectionDB.updateCollection(
             cid: cid,
             lenId: lentid,
-            date: DateFormat('yyyy-MM-dd').format(
-                DateFormat('dd-MM-yyyy').parse(_lentDateController.text)),
+            date: DateFormat(
+              'yyyy-MM-dd',
+            ).format(DateFormat('dd-MM-yyyy').parse(_lentDateController.text)),
             crAmt: total,
             drAmt: 0.0,
           );
@@ -98,8 +104,7 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
           }
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Lending details updated successfully')),
+            SnackBar(content: Text('lendingScreen.lendingUpdatedSuccess'.tr())),
           );
 
           /*Navigator.pushReplacement(
@@ -114,15 +119,14 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: const Text("Error"),
-                  content: const Text(
-                      'Total Amount is below the Collected Amount. Can\'t Update.'),
+                  title: Text("messages.error".tr()),
+                  content: Text('lendingScreen.invalidTotalAmount'.tr()),
                   actions: [
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: const Text("OK"),
+                      child: Text("actions.ok".tr()),
                     ),
                   ],
                 );
@@ -132,7 +136,7 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating lending details: $e')),
+          SnackBar(content: Text('${'lendingScreen.updateError'.tr()}: $e')),
         );
       }
     }
@@ -148,8 +152,9 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
   void _calculateDueDate() {
     if (_lentDateController.text.isNotEmpty &&
         _dueDaysController.text.isNotEmpty) {
-      DateTime lentDate =
-          DateFormat('dd-MM-yyyy').parse(_lentDateController.text);
+      DateTime lentDate = DateFormat(
+        'dd-MM-yyyy',
+      ).parse(_lentDateController.text);
       int dueDays = int.parse(_dueDaysController.text);
       DateTime dueDate = lentDate.add(Duration(days: dueDays));
       _dueDateController.text = DateFormat('dd-MM-yyyy').format(dueDate);
@@ -161,8 +166,9 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
     _amtGivenController.text = preloadedamtgiven.toString();
     _profitController.text = preladedprofit.toString();
     if (preladedlendate.isNotEmpty) {
-      _lentDateController.text = DateFormat('dd-MM-yyyy')
-          .format(DateFormat('yyyy-MM-dd').parse(preladedlendate));
+      _lentDateController.text = DateFormat(
+        'dd-MM-yyyy',
+      ).format(DateFormat('yyyy-MM-dd').parse(preladedlendate));
     }
     _dueDaysController.text = preladedduedays.toString();
 
@@ -178,7 +184,7 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: "Lending to - ${partyName ?? ''}",
+        title: "${'lendingScreen.title'.tr()} - ${partyName ?? ''}",
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -189,24 +195,27 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Financial Details Form Section
-                const Center(
+                Center(
                   child: Text(
-                    " Details",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    'lendingScreen.details'.tr(),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _amtGivenController,
-                  decoration: const InputDecoration(
-                    labelText: "Amount Given",
-                    hintText: "Enter the amount given",
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: 'lendingScreen.amountGiven'.tr(),
+                    hintText: 'lendingScreen.enterAmountGiven'.tr(),
+                    border: const OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the amount given';
+                      return 'lendingScreen.amountGivenRequired'.tr();
                     }
                     return null;
                   },
@@ -218,15 +227,15 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _profitController,
-                  decoration: const InputDecoration(
-                    labelText: "Profit",
-                    hintText: "Enter the profit",
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: 'lendingScreen.profit'.tr(),
+                    hintText: 'lendingScreen.enterProfit'.tr(),
+                    border: const OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the profit';
+                      return 'lendingScreen.profitRequired'.tr();
                     }
                     return null;
                   },
@@ -238,12 +247,12 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
                 const SizedBox(height: 10),
                 CustomTextField(
                   controller: _totalController,
-                  labelText: "Total",
-                  hintText: "Enter the total",
+                  labelText: 'lendingScreen.total'.tr(),
+                  hintText: 'lendingScreen.enterTotal'.tr(),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the total';
+                      return 'lendingScreen.totalRequired'.tr();
                     }
                     return null;
                   },
@@ -254,8 +263,8 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
                     Expanded(
                       child: CustomDatePicker(
                         controller: _lentDateController,
-                        labelText: "Lent Date",
-                        hintText: "Pick a lent date",
+                        labelText: 'lendingScreen.lentDate'.tr(),
+                        hintText: 'lendingScreen.pickLentDate'.tr(),
                         firstDate: DateTime(2000),
                         lastDate: DateTime.now(),
                       ),
@@ -264,15 +273,15 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
                     Expanded(
                       child: TextFormField(
                         controller: _dueDaysController,
-                        decoration: const InputDecoration(
-                          labelText: "Due Days",
-                          hintText: "Enter due days",
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: 'lendingScreen.dueDays'.tr(),
+                          hintText: 'lendingScreen.enterDueDays'.tr(),
+                          border: const OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter due days';
+                            return 'lendingScreen.dueDaysRequired'.tr();
                           }
                           return null;
                         },
@@ -291,8 +300,8 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
                     Expanded(
                       child: CustomTextField(
                         controller: _dueDateController,
-                        labelText: "Due Date",
-                        hintText: "Calculated due date",
+                        labelText: 'lendingScreen.dueDate'.tr(),
+                        hintText: 'lendingScreen.calculatedDueDate'.tr(),
                         readOnly: true,
                       ),
                     ),
@@ -307,28 +316,37 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         if (_formKey.currentState?.validate() == true) {
-                          DatabaseHelper.getLenId(lineName!, partyName!)
-                              .then((lenid) async {
+                          DatabaseHelper.getLenId(lineName!, partyName!).then((
+                            lenid,
+                          ) async {
                             if (lenid != null) {
                               final lenStatus =
                                   await dbLending.getStatusByLenId(lenid);
                               if (lenStatus == 'passive' ||
                                   preloadedamtgiven > 0) {
-                                _updateLending(context, lineName, partyName,
-                                    lenid, preloadedamtgiven);
+                                _updateLending(
+                                  context,
+                                  lineName,
+                                  partyName,
+                                  lenid,
+                                  preloadedamtgiven,
+                                );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                  SnackBar(
                                     content: Text(
-                                        'Error: Cannot lend amount to active state party'),
+                                      'lendingScreen.cannotLendToActive'.tr(),
+                                    ),
                                     backgroundColor: Colors.redAccent,
                                   ),
                                 );
                               }
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Error: LenId is null'),
+                                SnackBar(
+                                  content: Text(
+                                    'lendingScreen.lenIdError'.tr(),
+                                  ),
                                   backgroundColor: Colors.redAccent,
                                 ),
                               );
@@ -344,8 +362,8 @@ class LendingCombinedDetailsScreen extends ConsumerWidget {
                       ),
                       label: Text(
                         preloadedamtgiven >= 0
-                            ? "Update Lending"
-                            : "Submit Lending",
+                            ? 'lendingScreen.updateLending'.tr()
+                            : 'lendingScreen.submitLending'.tr(),
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,

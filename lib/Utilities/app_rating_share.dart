@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class AppRatingShare {
   static const String _appId = 'com.DigiThinkers.VasoolDiary';
@@ -47,9 +48,9 @@ class AppRatingShare {
                 const SizedBox(height: 20),
 
                 // Title
-                const Text(
-                  'Enjoying the App?',
-                  style: TextStyle(
+                Text(
+                  'appRatingShare.enjoyingApp'.tr(),
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -60,7 +61,7 @@ class AppRatingShare {
 
                 // Description
                 Text(
-                  'Your feedback helps us improve and reach more users. Please take a moment to rate our app!',
+                  'appRatingShare.feedbackMessage'.tr(),
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.white.withOpacity(0.9),
@@ -102,7 +103,7 @@ class AppRatingShare {
                           ),
                         ),
                         child: Text(
-                          'Maybe Later',
+                          'appRatingShare.maybeLater'.tr(),
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.8),
                             fontSize: 16,
@@ -131,9 +132,9 @@ class AppRatingShare {
                           elevation: 0,
                         ),
                         icon: const Icon(Icons.star, size: 20),
-                        label: const Text(
-                          'Rate Now',
-                          style: TextStyle(
+                        label: Text(
+                          'appRatingShare.rateNow'.tr(),
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -209,9 +210,9 @@ class AppRatingShare {
                 const SizedBox(height: 20),
 
                 // Title and subtitle
-                const Text(
-                  'Share Our App',
-                  style: TextStyle(
+                Text(
+                  'appRatingShare.shareOurApp'.tr(),
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -219,9 +220,9 @@ class AppRatingShare {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Help others discover our app',
-                  style: TextStyle(
+                Text(
+                  'appRatingShare.helpOthersDiscover'.tr(),
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
                   ),
@@ -232,8 +233,8 @@ class AppRatingShare {
                 // Share option
                 _buildShareOption(
                   icon: Icons.link,
-                  title: 'Share App Link',
-                  subtitle: 'Share the Google Play Store link',
+                  title: 'appRatingShare.shareAppLink'.tr(),
+                  subtitle: 'appRatingShare.sharePlayStoreLink'.tr(),
                   color: Colors.blue,
                   onTap: () {
                     Navigator.of(context).pop();
@@ -332,7 +333,8 @@ class AppRatingShare {
   static void _shareAppLink() {
     Share.share(
       _playStoreUrl,
-      subject: 'Check out $_appName!',
+      subject:
+          'appRatingShare.checkOutApp'.tr(namedArgs: {'appName': _appName}),
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:kskfinance/Utilities/Reports/CusFullTrans/ReportScreen2.dart';
 import 'package:kskfinance/Utilities/Reports/Custrans/ReportScreen1.dart';
 import 'package:kskfinance/Utilities/Reports/chartreport/ReportFilterScreen.dart';
 import 'package:kskfinance/Utilities/Reports/Dailyreport/PartyReportPage.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ViewReportsPage extends StatelessWidget {
   const ViewReportsPage({super.key});
@@ -14,7 +15,7 @@ class ViewReportsPage extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("View Reports"),
+        title: Text('reportsScreen.title'.tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -33,7 +34,7 @@ class ViewReportsPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                "Customer Reports",
+                'reportsScreen.customerReports'.tr(),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
@@ -47,8 +48,8 @@ class ViewReportsPage extends StatelessWidget {
               context: context,
               icon: Icons.description,
               iconColor: Colors.blue,
-              title: "Customer Transactions Report",
-              subtitle: "Summary of all customer transactions",
+              title: 'reportsScreen.customerTransactionsReport'.tr(),
+              subtitle: 'reportsScreen.customerTransactionsSubtitle'.tr(),
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => ReportScreen2()),
@@ -62,8 +63,8 @@ class ViewReportsPage extends StatelessWidget {
               context: context,
               icon: Icons.picture_as_pdf,
               iconColor: Colors.deepPurple,
-              title: "Customer List PDF",
-              subtitle: "List of all customers",
+              title: 'reportsScreen.customerListPdf'.tr(),
+              subtitle: 'reportsScreen.customerListSubtitle'.tr(),
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const ReportScreen1()),
@@ -74,8 +75,8 @@ class ViewReportsPage extends StatelessWidget {
               context: context,
               icon: Icons.description,
               iconColor: Colors.blue,
-              title: "Daily Transaction Chart Report",
-              subtitle: "Summary of all Daily transactions",
+              title: 'reportsScreen.dailyTransactionChart'.tr(),
+              subtitle: 'reportsScreen.dailyTransactionSubtitle'.tr(),
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const ReportFilterScreen()),
@@ -85,8 +86,8 @@ class ViewReportsPage extends StatelessWidget {
               context: context,
               icon: Icons.description,
               iconColor: Colors.blue,
-              title: "Pending Transaction Report",
-              subtitle: "Summary of all Party pending transactions",
+              title: 'reportsScreen.pendingTransactionReport'.tr(),
+              subtitle: 'reportsScreen.pendingTransactionSubtitle'.tr(),
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -97,8 +98,8 @@ class ViewReportsPage extends StatelessWidget {
               context: context,
               icon: Icons.description,
               iconColor: Colors.blue,
-              title: "Active Parties Report",
-              subtitle: "Summary of all Party transactions-Your Diary",
+              title: 'reportsScreen.activePartiesReport'.tr(),
+              subtitle: 'reportsScreen.activePartiesSubtitle'.tr(),
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const PartyReportPage()),

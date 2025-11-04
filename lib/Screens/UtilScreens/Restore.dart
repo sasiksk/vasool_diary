@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:lottie/lottie.dart'; // For animations
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart' as sql;
+import 'package:easy_localization/easy_localization.dart';
 
 class RestorePage extends StatefulWidget {
   @override
@@ -72,9 +73,9 @@ class _RestorePageState extends State<RestorePage> {
                             repeat: false,
                           ),
                           const SizedBox(height: 16),
-                          const Text(
-                            'Database Restored Successfully!',
-                            style: TextStyle(
+                          Text(
+                            'restoreScreen.databaseRestoredSuccessfully'.tr(),
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.green,
@@ -85,7 +86,8 @@ class _RestorePageState extends State<RestorePage> {
                             onPressed: () {
                               exit(0); // Exit the application
                             },
-                            child: const Text('Restart Application'),
+                            child:
+                                Text('restoreScreen.restartApplication'.tr()),
                           ),
                         ],
                       ),
@@ -97,27 +99,31 @@ class _RestorePageState extends State<RestorePage> {
           } else {
             // Notify the user about the invalid file type
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Invalid file type. Please select a .db file.'),
+              SnackBar(
+                content: Text('restoreScreen.invalidFileType'.tr()),
               ),
             );
           }
         } else {
           // User canceled the picker
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No file selected.')),
+            SnackBar(content: Text('restoreScreen.noFileSelected'.tr())),
           );
         }
       } else {
         // Permissions not granted
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Storage permissions not granted.')),
+          SnackBar(
+              content: Text('restoreScreen.storagePermissionsNotGranted'.tr())),
         );
       }
     } catch (e) {
       // Handle any errors
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error restoring database: $e')),
+        SnackBar(
+            content: Text('restoreScreen.errorRestoringDatabase'.tr(namedArgs: {
+          'error': e.toString(),
+        }))),
       );
     } finally {
       setState(() {
@@ -130,7 +136,7 @@ class _RestorePageState extends State<RestorePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Restore Database'),
+        title: Text('restoreScreen.title'.tr()),
       ),
       body: Center(
         child: _isLoading
@@ -144,9 +150,9 @@ class _RestorePageState extends State<RestorePage> {
                     repeat: true,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Restoring your database...',
-                    style: TextStyle(
+                  Text(
+                    'restoreScreen.restoringDatabase'.tr(),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -163,12 +169,12 @@ class _RestorePageState extends State<RestorePage> {
                     repeat: true,
                   ),
                   const SizedBox(height: 16),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Text(
-                      'Hello User! Please choose the correct file to restore your database. Kindly restart the application after restoring. Thank you!\n\nFor any queries, contact sasiksr4@gmail.com',
+                      'restoreScreen.restoreInstructions'.tr(),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -178,7 +184,7 @@ class _RestorePageState extends State<RestorePage> {
                   ElevatedButton.icon(
                     onPressed: restoreDatabase,
                     icon: const Icon(Icons.restore),
-                    label: const Text('Restore Database'),
+                    label: Text('restoreScreen.restoreYourDatabase'.tr()),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: Colors.blue,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ContactPage extends StatelessWidget {
   const ContactPage({super.key});
@@ -25,7 +26,7 @@ class ContactPage extends StatelessWidget {
     final Uri launchUri = Uri(
       scheme: 'mailto',
       path: email,
-      query: 'subject=Vasool Diary Support Query',
+      query: 'subject=${'contactScreen.emailSubject'.tr()}',
     );
     try {
       if (await canLaunchUrl(launchUri)) {
@@ -40,7 +41,8 @@ class ContactPage extends StatelessWidget {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$type copied to clipboard!'),
+        content: Text(
+            'contactScreen.copiedToClipboard'.tr(namedArgs: {'type': type})),
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 2),
       ),
@@ -52,9 +54,9 @@ class ContactPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text(
-          'Contact Support',
-          style: TextStyle(
+        title: Text(
+          'contactScreen.title'.tr(),
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -94,18 +96,18 @@ class ContactPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Need Help?',
-                      style: TextStyle(
+                    Text(
+                      'contactScreen.needHelp'.tr(),
+                      style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'We\'re here to assist you with Vasool Diary',
-                      style: TextStyle(
+                    Text(
+                      'contactScreen.hereToAssist'.tr(),
+                      style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
                       ),
@@ -159,9 +161,9 @@ class ContactPage extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Call Support',
-                                      style: TextStyle(
+                                    Text(
+                                      'contactScreen.callSupport'.tr(),
+                                      style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
@@ -169,7 +171,7 @@ class ContactPage extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Available 24/7 for assistance',
+                                      'contactScreen.available24x7'.tr(),
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey[600],
@@ -185,8 +187,10 @@ class ContactPage extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: GestureDetector(
-                                  onLongPress: () => _copyToClipboard(context,
-                                      '+91-7010069234', 'Phone number'),
+                                  onLongPress: () => _copyToClipboard(
+                                      context,
+                                      '+91-7010069234',
+                                      'contactScreen.phoneNumber'.tr()),
                                   child: Container(
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
@@ -267,9 +271,9 @@ class ContactPage extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Email Support',
-                                      style: TextStyle(
+                                    Text(
+                                      'contactScreen.emailSupport'.tr(),
+                                      style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
@@ -277,7 +281,7 @@ class ContactPage extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'We\'ll respond within 24 hours',
+                                      'contactScreen.respondWithin24Hours'.tr(),
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey[600],
@@ -293,8 +297,10 @@ class ContactPage extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: GestureDetector(
-                                  onLongPress: () => _copyToClipboard(context,
-                                      'sasiksr4@gmail.com', 'Email address'),
+                                  onLongPress: () => _copyToClipboard(
+                                      context,
+                                      'sasiksr4@gmail.com',
+                                      'contactScreen.emailAddress'.tr()),
                                   child: Container(
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
@@ -361,9 +367,9 @@ class ContactPage extends StatelessWidget {
                                 size: 24,
                               ),
                               const SizedBox(width: 12),
-                              const Text(
-                                'Quick Tips',
-                                style: TextStyle(
+                              Text(
+                                'contactScreen.quickTips'.tr(),
+                                style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black87,
@@ -374,14 +380,10 @@ class ContactPage extends StatelessWidget {
                           const SizedBox(height: 16),
                           Column(
                             children: [
-                              _buildTipItem(
-                                  '📱 Long press on phone/email to copy'),
-                              _buildTipItem(
-                                  '💾 Regular backups keep your data safe'),
-                              _buildTipItem(
-                                  '🔄 Update app for latest features'),
-                              _buildTipItem(
-                                  '❓ Include screenshots when reporting issues'),
+                              _buildTipItem('contactScreen.tip1'.tr()),
+                              _buildTipItem('contactScreen.tip2'.tr()),
+                              _buildTipItem('contactScreen.tip3'.tr()),
+                              _buildTipItem('contactScreen.tip4'.tr()),
                             ],
                           ),
                         ],
@@ -415,9 +417,9 @@ class ContactPage extends StatelessWidget {
                           size: 40,
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Thank You!',
-                          style: TextStyle(
+                        Text(
+                          'contactScreen.thankYou'.tr(),
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -425,7 +427,7 @@ class ContactPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'For using Vasool Diary\nYour trust motivates us to keep improving',
+                          'contactScreen.thankYouMessage'.tr(),
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],

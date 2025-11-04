@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
 import 'package:kskfinance/Utilities/CustomTextField.dart';
 import 'package:kskfinance/Screens/Main/home_screen.dart';
@@ -53,7 +54,7 @@ class _LineScreenState extends State<LineScreen> {
           );
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Book entry updated successfully')),
+            SnackBar(content: Text('lineScreen.bookEntryUpdated'.tr())),
           );
         } else {
           // Insert new entry
@@ -61,7 +62,7 @@ class _LineScreenState extends State<LineScreen> {
             _lineNameController.text,
           );
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Book entry added successfully')),
+            SnackBar(content: Text('lineScreen.bookEntryAdded'.tr())),
           );
         }
         _resetForm();
@@ -81,7 +82,9 @@ class _LineScreenState extends State<LineScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: widget.entry != null ? 'Edit Book' : 'Add New Book',
+        title: widget.entry != null
+            ? 'lineScreen.editBook'.tr()
+            : 'lineScreen.addNewBook'.tr(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -92,11 +95,11 @@ class _LineScreenState extends State<LineScreen> {
             children: [
               CustomTextField(
                 controller: _lineNameController,
-                labelText: 'Enter Line Name',
-                hintText: 'Enter Line Name',
+                labelText: 'lineScreen.enterLineName'.tr(),
+                hintText: 'lineScreen.enterLineName'.tr(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter Name';
+                    return 'lineScreen.pleaseEnterName'.tr();
                   }
                   return null;
                 },
@@ -107,14 +110,16 @@ class _LineScreenState extends State<LineScreen> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _submitForm,
-                      child: Text(widget.entry != null ? 'Update' : 'Submit'),
+                      child: Text(widget.entry != null
+                          ? 'lineScreen.update'.tr()
+                          : 'lineScreen.submit'.tr()),
                     ),
                   ),
                   const SizedBox(width: 16.0),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _resetForm,
-                      child: const Text('Reset'),
+                      child: Text('lineScreen.reset'.tr()),
                     ),
                   ),
                 ],
@@ -127,7 +132,7 @@ class _LineScreenState extends State<LineScreen> {
                     MaterialPageRoute(builder: (context) => const HomeScreen()),
                   );
                 },
-                child: const Text('Back'),
+                child: Text('lineScreen.back'.tr()),
               ),
             ],
           ),

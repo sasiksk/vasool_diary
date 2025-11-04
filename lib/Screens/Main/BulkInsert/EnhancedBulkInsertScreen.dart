@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
 import 'package:kskfinance/Screens/Main/CollectionScreen.dart';
 import 'package:intl/intl.dart';
@@ -62,12 +63,11 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Collection Entry'),
-          content: const Text(
-              'Select parties and amounts, then use Bulk Update. SMS will be sent individually with confirmation.'),
+          title: Text('bulkInsertScreen.infoTitle'.tr()),
+          content: Text('bulkInsertScreen.infoMessage'.tr()),
           actions: <Widget>[
             TextButton(
-              child: const Text('OK'),
+              child: Text('bulkInsertScreen.ok'.tr()),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ],
@@ -220,7 +220,7 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
     }
 
     if (selectedEntries.isEmpty) {
-      _showSnackBar('No parties selected or amounts entered', Colors.orange);
+      _showSnackBar('bulkInsertScreen.noPartiesSelected'.tr(), Colors.orange);
       return;
     }
 
@@ -234,7 +234,7 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Bulk Update Confirmation'),
+          title: Text('bulkInsertScreen.bulkUpdateConfirmation'.tr()),
           content: Container(
             width: double.maxFinite,
             constraints: const BoxConstraints(maxHeight: 300),
@@ -250,24 +250,27 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Line:',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text('bulkInsertScreen.line'.tr(),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
                             Text(_selectedLineName ?? ''),
                           ],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Date:',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text('bulkInsertScreen.date'.tr(),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
                             Text(DateFormat('dd-MM-yyyy').format(selectedDate)),
                           ],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Parties:',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text('bulkInsertScreen.parties'.tr(),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
                             Text('${entries.length}'),
                           ],
                         ),
@@ -275,8 +278,8 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Total:',
-                                style: TextStyle(
+                            Text('bulkInsertScreen.total'.tr(),
+                                style: const TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 16)),
                             Text('₹${totalAmount.toStringAsFixed(2)}',
                                 style: const TextStyle(
@@ -312,7 +315,7 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
+              child: Text('bulkInsertScreen.cancel'.tr()),
             ),
             ElevatedButton(
               onPressed: () {
@@ -320,8 +323,8 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                 _executeUpdates(entries, totalAmount);
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              child: const Text('Confirm Update',
-                  style: TextStyle(color: Colors.white)),
+              child: Text('bulkInsertScreen.confirmUpdate'.tr(),
+                  style: const TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -384,7 +387,10 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
       _showSuccessDialog(successCount, totalAmount, smsQueue.length);
     } catch (e) {
       Navigator.of(context).pop();
-      _showSnackBar('Update failed: $e', Colors.red);
+      _showSnackBar(
+          'bulkInsertScreen.updateFailed'
+              .tr(namedArgs: {'error': e.toString()}),
+          Colors.red);
     } finally {
       setState(() {
         isProcessing = false;
@@ -407,8 +413,12 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
       final dateForSms = DateFormat('dd-MM-yyyy').format(selectedDate);
 
       // Compact SMS message with date but no time
-      final smsMessage =
-          'Payment Received!\nDate: $dateForSms\nAmount: ₹${amount.toStringAsFixed(2)}\nBalance: ₹${newBalance.toStringAsFixed(2)}\nThank You! - $financeName';
+      final smsMessage = 'bulkInsertScreen.smsPaymentReceived'.tr(namedArgs: {
+        'date': dateForSms,
+        'amount': amount.toStringAsFixed(2),
+        'balance': newBalance.toStringAsFixed(2),
+        'financeName': financeName,
+      });
 
       smsQueue.add({
         'phone': phone,
@@ -430,11 +440,17 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
         try {
           await sendSms(smsData['phone']!, smsData['message']!);
           if (mounted) {
-            _showSnackBar('SMS sent to ${smsData['partyName']}', Colors.green);
+            _showSnackBar(
+                'bulkInsertScreen.smsSent'
+                    .tr(namedArgs: {'partyName': smsData['partyName']!}),
+                Colors.green);
           }
         } catch (e) {
           if (mounted) {
-            _showSnackBar('SMS failed for ${smsData['partyName']}', Colors.red);
+            _showSnackBar(
+                'bulkInsertScreen.smsFailed'
+                    .tr(namedArgs: {'partyName': smsData['partyName']!}),
+                Colors.red);
           }
         }
       } else if (sendThis == null) {
@@ -456,17 +472,20 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('SMS $current of $total'),
+          title: Text('bulkInsertScreen.smsConfirmation'.tr(namedArgs: {
+            'current': current.toString(),
+            'total': total.toString()
+          })),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Party: ${smsData['partyName']}',
+              Text('${'bulkInsertScreen.party'.tr()} ${smsData['partyName']}',
                   style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text('Phone: ${smsData['phone']}'),
+              Text('${'bulkInsertScreen.phone'.tr()} ${smsData['phone']}'),
               const SizedBox(height: 8),
-              const Text('Message:',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('bulkInsertScreen.message'.tr(),
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
@@ -481,17 +500,17 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(null),
-              child: const Text('Cancel All'),
+              child: Text('bulkInsertScreen.cancelAll'.tr()),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Skip'),
+              child: Text('bulkInsertScreen.skip'.tr()),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              child:
-                  const Text('Send SMS', style: TextStyle(color: Colors.white)),
+              child: Text('bulkInsertScreen.sendSms'.tr(),
+                  style: const TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -511,9 +530,10 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
             children: [
               const CircularProgressIndicator(),
               const SizedBox(height: 16),
-              Text('Processing $count collections...'),
-              const Text('Please wait...',
-                  style: TextStyle(fontSize: 12, color: Colors.grey)),
+              Text('bulkInsertScreen.processingCollections'
+                  .tr(namedArgs: {'count': count.toString()})),
+              Text('bulkInsertScreen.pleaseWait'.tr(),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey)),
             ],
           ),
         );
@@ -526,13 +546,16 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Update Complete'),
+          title: Text('bulkInsertScreen.updateComplete'.tr()),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('✅ Successfully updated $count collections'),
-              Text('💰 Total amount: ₹${total.toStringAsFixed(2)}'),
-              Text('📱 SMS processed: $smsCount'),
+              Text('bulkInsertScreen.successfullyUpdated'
+                  .tr(namedArgs: {'count': count.toString()})),
+              Text('bulkInsertScreen.totalAmount'
+                  .tr(namedArgs: {'amount': total.toStringAsFixed(2)})),
+              Text('bulkInsertScreen.smsProcessed'
+                  .tr(namedArgs: {'count': smsCount.toString()})),
             ],
           ),
           actions: [
@@ -542,7 +565,8 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                 Navigator.of(context).pop(); // Go back to previous screen
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              child: const Text('Done', style: TextStyle(color: Colors.white)),
+              child: Text('bulkInsertScreen.done'.tr(),
+                  style: const TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -576,8 +600,9 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
       appBar: AppBar(
         backgroundColor: Colors.teal.shade900,
         elevation: 0,
-        title: const Text('Collection Entry ',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text('bulkInsertScreen.collectionEntry'.tr(),
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold)),
       ),
       body: SafeArea(
         child: Padding(
@@ -595,11 +620,11 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                           Expanded(
                             flex: 3,
                             child: DropdownButtonFormField<String>(
-                              decoration: const InputDecoration(
-                                labelText: 'Line Name',
-                                border: OutlineInputBorder(),
+                              decoration: InputDecoration(
+                                labelText: 'bulkInsertScreen.selectLine'.tr(),
+                                border: const OutlineInputBorder(),
                                 isDense: true,
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                     vertical: 8, horizontal: 10),
                               ),
                               value: _selectedLineName,
@@ -610,6 +635,9 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                               onChanged: (value) {
                                 setState(() {
                                   _selectedLineName = value;
+                                  // Clear existing data immediately to prevent showing old parties
+                                  lendingDetails.clear();
+                                  _resetData();
                                 });
                                 if (value != null) _loadPartyNames(value);
                               },
@@ -620,14 +648,14 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                             flex: 2,
                             child: TextFormField(
                               controller: _dateController,
-                              decoration: const InputDecoration(
-                                labelText: 'Date',
-                                border: OutlineInputBorder(),
+                              decoration: InputDecoration(
+                                labelText: 'bulkInsertScreen.selectDate'.tr(),
+                                border: const OutlineInputBorder(),
                                 isDense: true,
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                     vertical: 8, horizontal: 10),
                                 suffixIcon:
-                                    Icon(Icons.calendar_today, size: 12),
+                                    const Icon(Icons.calendar_today, size: 12),
                               ),
                               readOnly: true,
                               onTap: _selectDate,
@@ -638,13 +666,13 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _searchController,
-                        decoration: const InputDecoration(
-                          labelText: 'Search Party',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          labelText: 'bulkInsertScreen.searchParty'.tr(),
+                          border: const OutlineInputBorder(),
                           isDense: true,
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                          prefixIcon: Icon(Icons.search, size: 18),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 10),
+                          prefixIcon: const Icon(Icons.search, size: 18),
                         ),
                         onChanged: _filterParties,
                       ),
@@ -749,7 +777,7 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                                           const SizedBox(
                                               width: 4), // Reduced spacing
                                           Text(
-                                            'Daily',
+                                            'bulkInsertScreen.dailyView'.tr(),
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               color: !_isWeeklyView
@@ -843,7 +871,7 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                                           const SizedBox(
                                               width: 4), // Reduced spacing
                                           Text(
-                                            'Weekly',
+                                            'bulkInsertScreen.weeklyView'.tr(),
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               color: _isWeeklyView
@@ -872,11 +900,12 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
               // Party List
               Expanded(
                 child: filteredLendingDetails.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
-                          'No active parties found.\nSelect a line to view parties.',
+                          'bulkInsertScreen.noPartiesFound'.tr(),
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                          style:
+                              const TextStyle(fontSize: 14, color: Colors.grey),
                         ),
                       )
                     : ListView.builder(
@@ -907,7 +936,7 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                                           ? FontWeight.bold
                                           : FontWeight.normal)),
                               subtitle: Text(
-                                  'Balance: ₹${balanceAmt.toStringAsFixed(2)}'),
+                                  '${'bulkInsertScreen.balance'.tr()}: ₹${balanceAmt.toStringAsFixed(2)}'),
                               trailing: SizedBox(
                                 width: 80,
                                 child: TextFormField(
@@ -957,11 +986,11 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                            'Selected: ${selectedParties.values.where((selected) => selected).length}',
+                            '${'bulkInsertScreen.selected'.tr()}: ${selectedParties.values.where((selected) => selected).length}',
                             style:
                                 const TextStyle(fontWeight: FontWeight.bold)),
                         Text(
-                            'Total: ₹${_calculateTotalSelected().toStringAsFixed(2)}',
+                            '${'bulkInsertScreen.total'.tr()}: ₹${_calculateTotalSelected().toStringAsFixed(2)}',
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green,
@@ -984,8 +1013,8 @@ class _EnhancedBulkInsertScreenState extends State<EnhancedBulkInsertScreen> {
                                 color: Colors.white),
                         label: Text(
                             isProcessing
-                                ? 'Processing...'
-                                : 'Bulk Update & Send SMS',
+                                ? 'bulkInsertScreen.processing'.tr()
+                                : 'bulkInsertScreen.bulkUpdateSms'.tr(),
                             style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

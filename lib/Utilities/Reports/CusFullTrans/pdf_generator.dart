@@ -6,6 +6,18 @@ import 'package:open_file/open_file.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 
+// Helper function to detect Tamil text
+bool containsTamilText(String text) {
+  // Tamil Unicode range: \u0B80-\u0BFF
+  return RegExp(r'[\u0B80-\u0BFF]').hasMatch(text);
+}
+
+// Helper function to get appropriate font for text
+pw.Font getAppropriateFont(
+    String text, pw.Font englishFont, pw.Font tamilFont) {
+  return containsTamilText(text) ? tamilFont : englishFont;
+}
+
 class PdfEntry {
   final String partyName;
   final String date;
@@ -40,9 +52,12 @@ Future<void> generatePdf(
 
   final pdf = pw.Document();
 
-  // Load custom font from assets
+  // Load custom fonts from assets
   final fontData = await rootBundle.load("assets/fonts/Roboto-Regular.ttf");
+  final tamilFontData =
+      await rootBundle.load("assets/fonts/NotoSansTamil-Regular.ttf");
   final ttf = pw.Font.ttf(fontData);
+  final tamilTtf = pw.Font.ttf(tamilFontData);
 
   pdf.addPage(
     pw.MultiPage(
@@ -86,10 +101,9 @@ Future<void> generatePdf(
 
           // Table Section
           if (isPartyWise)
-            ..._buildPartyWiseTable(entries, ttf)
+            ..._buildPartyWiseTable(entries, ttf, tamilTtf)
           else
-            ..._buildDateWiseTable(entries,
-                ttf), // <-- add spread operator here  // Build Date-wise table
+            ..._buildDateWiseTable(entries, ttf, tamilTtf),
         ];
       },
     ),
@@ -102,7 +116,8 @@ Future<void> generatePdf(
   OpenFile.open(file.path);
 }
 
-List<pw.Widget> _buildPartyWiseTable(List<PdfEntry> entries, pw.Font ttf) {
+List<pw.Widget> _buildPartyWiseTable(
+    List<PdfEntry> entries, pw.Font ttf, pw.Font tamilTtf) {
   final groupedEntries = <String, List<PdfEntry>>{};
 
   // Group entries by partyName
@@ -129,7 +144,7 @@ List<pw.Widget> _buildPartyWiseTable(List<PdfEntry> entries, pw.Font ttf) {
         child: pw.Text(
           "Party Name: $partyName",
           style: pw.TextStyle(
-            font: ttf,
+            font: getAppropriateFont(partyName, ttf, tamilTtf),
             fontSize: 14,
             fontWeight: pw.FontWeight.bold,
             color: PdfColors.blue800,
@@ -283,7 +298,8 @@ String _formatDate(String date) {
   }
 }
 
-List<pw.Widget> _buildDateWiseTable(List<PdfEntry> entries, pw.Font ttf) {
+List<pw.Widget> _buildDateWiseTable(
+    List<PdfEntry> entries, pw.Font ttf, pw.Font tamilTtf) {
   final groupedEntries = <String, List<PdfEntry>>{};
   final List<pw.Widget> widgets = [];
   // Group entries by date
@@ -388,7 +404,10 @@ List<pw.Widget> _buildDateWiseTable(List<PdfEntry> entries, pw.Font ttf) {
                   padding: const pw.EdgeInsets.all(8),
                   child: pw.Text(
                     pdfEntry.partyName,
-                    style: pw.TextStyle(font: ttf, fontSize: 10),
+                    style: pw.TextStyle(
+                        font: getAppropriateFont(
+                            pdfEntry.partyName, ttf, tamilTtf),
+                        fontSize: 10),
                   ),
                 ),
                 pw.Padding(

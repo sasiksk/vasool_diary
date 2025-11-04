@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class FinancialOverviewCard extends StatefulWidget {
   final double totalAmtGiven;
@@ -64,10 +65,10 @@ class _FinancialOverviewCardState extends State<FinancialOverviewCard> {
                       color: Colors.white, size: 28),
                 ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Financial Overview',
-                    style: TextStyle(
+                    'home.financialOverview'.tr(),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
@@ -97,7 +98,7 @@ class _FinancialOverviewCardState extends State<FinancialOverviewCard> {
                       children: [
                         Expanded(
                           child: _buildStatItem(
-                            'Total Amount',
+                            'home.totalAmount'.tr(),
                             '₹${_numberFormat.format(widget.totalAmtGiven + widget.totalProfit)}',
                             Icons.trending_up,
                             Colors.greenAccent,
@@ -106,7 +107,7 @@ class _FinancialOverviewCardState extends State<FinancialOverviewCard> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: _buildStatItem(
-                            'Received',
+                            'home.received'.tr(),
                             '₹${_numberFormat.format(widget.totalAmtRecieved)}',
                             Icons.download,
                             Colors.lightBlueAccent,
@@ -129,9 +130,9 @@ class _FinancialOverviewCardState extends State<FinancialOverviewCard> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Outstanding Balance',
-                                style: TextStyle(
+                              Text(
+                                'home.outstandingBalance'.tr(),
+                                style: const TextStyle(
                                   color: Colors.white70,
                                   fontSize: 14,
                                 ),

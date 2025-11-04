@@ -5,6 +5,18 @@ import 'dart:io';
 import 'package:open_file/open_file.dart';
 import 'package:flutter/services.dart';
 
+// Helper function to detect if text contains Tamil characters
+bool containsTamil(String text) {
+  final tamilRegex = RegExp(r'[\u0B80-\u0BFF]');
+  return tamilRegex.hasMatch(text);
+}
+
+// Helper function to get appropriate font for text
+pw.Font getAppropriateFont(
+    String text, pw.Font regularFont, pw.Font tamilFont) {
+  return containsTamil(text) ? tamilFont : regularFont;
+}
+
 class PdfEntry {
   final String lineName;
   final String partyName;
@@ -45,8 +57,11 @@ Future<void> generateNewPdf(
 
   final pdf = pw.Document();
 
+  // Load both regular and Tamil fonts
   final ttf =
       pw.Font.ttf(await rootBundle.load("assets/fonts/Roboto-Regular.ttf"));
+  final tamilTtf = pw.Font.ttf(
+      await rootBundle.load("assets/fonts/NotoSansTamil-Regular.ttf"));
 
   final today = DateTime.now();
   final formattedDate = "${today.day}-${today.month}-${today.year}";
@@ -66,7 +81,7 @@ Future<void> generateNewPdf(
                   pw.Text(
                     '$finname',
                     style: pw.TextStyle(
-                      font: ttf,
+                      font: getAppropriateFont(finname, ttf, tamilTtf),
                       fontSize: 18,
                       fontWeight: pw.FontWeight.bold,
                       color: PdfColors.white,
@@ -243,7 +258,7 @@ Future<void> generateNewPdf(
                         child: pw.Text(
                           entry.key,
                           style: pw.TextStyle(
-                            font: ttf,
+                            font: getAppropriateFont(entry.key, ttf, tamilTtf),
                             fontSize: 12,
                             fontWeight: pw.FontWeight.bold,
                           ),
@@ -279,7 +294,8 @@ Future<void> generateNewPdf(
                           child: pw.Text(
                             pdfEntry.partyName,
                             style: pw.TextStyle(
-                              font: ttf,
+                              font: getAppropriateFont(
+                                  pdfEntry.partyName, ttf, tamilTtf),
                               fontSize: 12,
                             ),
                           ),

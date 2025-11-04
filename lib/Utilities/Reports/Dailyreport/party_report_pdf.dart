@@ -1,19 +1,33 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:open_file/open_file.dart';
-import 'package:share_plus/share_plus.dart';
+
+// Helper function to detect if text contains Tamil characters
+bool containsTamil(String text) {
+  final tamilRegex = RegExp(r'[\u0B80-\u0BFF]');
+  return tamilRegex.hasMatch(text);
+}
+
+// Helper function to get appropriate font for text
+pw.Font getAppropriateFont(
+    String text, pw.Font regularFont, pw.Font tamilFont) {
+  return containsTamil(text) ? tamilFont : regularFont;
+}
 
 Future<void> generatePartyReportPdf(
     List<Map<String, dynamic>> summaryList, String financeName) async {
   final pdf = pw.Document();
   final today = DateFormat('dd-MM-yyyy').format(DateTime.now());
+
+  // Load both regular and Tamil fonts
+  final regularFont =
+      pw.Font.ttf(await rootBundle.load("assets/fonts/Roboto-Regular.ttf"));
+  final tamilFont = pw.Font.ttf(
+      await rootBundle.load("assets/fonts/NotoSansTamil-Regular.ttf"));
 
   pdf.addPage(
     pw.MultiPage(
@@ -30,6 +44,8 @@ Future<void> generatePartyReportPdf(
                     fontSize: 20,
                     fontWeight: pw.FontWeight.bold,
                     color: PdfColors.teal800,
+                    font:
+                        getAppropriateFont(financeName, regularFont, tamilFont),
                   ),
                 ),
                 pw.SizedBox(height: 6),
@@ -83,6 +99,8 @@ Future<void> generatePartyReportPdf(
                         fontSize: 13,
                         fontWeight: pw.FontWeight.bold,
                         color: PdfColors.black,
+                        font: getAppropriateFont(
+                            partyName, regularFont, tamilFont),
                       ),
                     ),
                     pw.SizedBox(height: 6),

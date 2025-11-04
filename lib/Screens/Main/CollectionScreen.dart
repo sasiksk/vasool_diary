@@ -7,6 +7,7 @@ import 'package:kskfinance/Utilities/CustomDatePicker.dart';
 import 'package:kskfinance/finance_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 // ...existing code...
 
@@ -156,10 +157,19 @@ class CollectionScreen extends ConsumerWidget {
       if (!skipSms && sms == 1 && pno != 'Unknown') {
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         final financeName = prefs.getString('financeName') ?? '';
-        await sendSms(
-          pno,
-          'Date: $date, Paid: $collectedAmt, Bal: ${currentgivenamt - newAmtCollected}. Thank You, $financeName',
-        );
+
+        // Format the date for SMS (without time)
+        final dateForSms = DateFormat('dd-MM-yyyy')
+            .format(DateFormat('dd-MM-yyyy').parse(date));
+
+        final smsMessage = 'collectionScreen.smsPaymentReceived'.tr(namedArgs: {
+          'date': dateForSms,
+          'amount': collectedAmt.toStringAsFixed(2),
+          'balance': (currentgivenamt - newAmtCollected).toStringAsFixed(2),
+          'financeName': financeName,
+        });
+
+        await sendSms(pno, smsMessage);
       }
     } else {
       // Show error dialog if amount exceeds
@@ -168,8 +178,8 @@ class CollectionScreen extends ConsumerWidget {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text("Error"),
-              content: const Text('Amount exceeds original. Can\'t Update.'),
+              title: Text('collectionScreen.error'.tr()),
+              content: Text('collectionScreen.amountExceedsOriginal'.tr()),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -179,7 +189,7 @@ class CollectionScreen extends ConsumerWidget {
                           builder: (context) => const PartyDetailScreen()),
                     );
                   },
-                  child: const Text("OK"),
+                  child: Text('collectionScreen.ok'.tr()),
                 ),
               ],
             );
@@ -198,7 +208,7 @@ class CollectionScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(partyName ?? "Add Collection"),
+        title: Text(partyName ?? 'collectionScreen.title'.tr()),
         centerTitle: true,
         elevation: 2,
       ),
@@ -208,15 +218,15 @@ class CollectionScreen extends ConsumerWidget {
           child: Column(
             children: [
               // Summary Section
-              const Card(
+              Card(
                 elevation: 2,
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
                       Text(
-                        "Collection Entry",
-                        style: TextStyle(
+                        'collectionScreen.collectionEntry'.tr(),
+                        style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Colors.blue),
@@ -241,23 +251,24 @@ class CollectionScreen extends ConsumerWidget {
                       children: [
                         CustomDatePicker(
                           controller: _dateController,
-                          labelText: "Date of Payment",
-                          hintText: "Pick the date of payment",
+                          labelText: 'collectionScreen.dateOfPayment'.tr(),
+                          hintText: 'collectionScreen.pickDateOfPayment'.tr(),
                           firstDate: DateTime(2000),
                           lastDate: DateTime.now(),
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
                           controller: _amtCollectedController,
-                          decoration: const InputDecoration(
-                            labelText: "Amount Collected",
-                            hintText: "Enter the amount collected",
-                            border: OutlineInputBorder(),
+                          decoration: InputDecoration(
+                            labelText: 'collectionScreen.amountCollected'.tr(),
+                            hintText:
+                                'collectionScreen.enterAmountCollected'.tr(),
+                            border: const OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.number,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter the amount collected';
+                              return 'collectionScreen.pleaseEnterAmount'.tr();
                             }
                             return null;
                           },
@@ -293,8 +304,10 @@ class CollectionScreen extends ConsumerWidget {
                                       );
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        const SnackBar(
-                                            content: Text('Form Submitted')),
+                                        SnackBar(
+                                            content: Text(
+                                                'collectionScreen.formSubmitted'
+                                                    .tr())),
                                       );
                                       Navigator.pushReplacement(
                                         context,
@@ -305,15 +318,18 @@ class CollectionScreen extends ConsumerWidget {
                                     } else {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                             content: Text(
-                                                'Error: LenId or LineName is null')),
+                                                'collectionScreen.errorLenIdNull'
+                                                    .tr())),
                                       );
                                     }
                                   }
                                 },
                                 child: Text(
-                                  preloadedCid != null ? "Update" : "Submit",
+                                  preloadedCid != null
+                                      ? 'collectionScreen.update'.tr()
+                                      : 'collectionScreen.submit'.tr(),
                                   style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold),
@@ -336,16 +352,20 @@ class CollectionScreen extends ConsumerWidget {
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title:
-                                              const Text("Delete Confirmation"),
-                                          content: const Text(
-                                              "Are you sure you want to delete this entry?"),
+                                          title: Text(
+                                              'collectionScreen.deleteConfirmation'
+                                                  .tr()),
+                                          content: Text(
+                                              'collectionScreen.deleteConfirmationMessage'
+                                                  .tr()),
                                           actions: [
                                             TextButton(
                                               onPressed: () {
                                                 Navigator.of(context).pop();
                                               },
-                                              child: const Text("Cancel"),
+                                              child: Text(
+                                                  'collectionScreen.cancel'
+                                                      .tr()),
                                             ),
                                             TextButton(
                                               onPressed: () async {
@@ -360,8 +380,10 @@ class CollectionScreen extends ConsumerWidget {
                                                   partyName!,
                                                 );
                                               },
-                                              child: const Text("Delete",
-                                                  style: TextStyle(
+                                              child: Text(
+                                                  'collectionScreen.delete'
+                                                      .tr(),
+                                                  style: const TextStyle(
                                                       color: Colors.red)),
                                             ),
                                           ],
@@ -378,7 +400,9 @@ class CollectionScreen extends ConsumerWidget {
                                   }
                                 },
                                 child: Text(
-                                  preloadedCid != null ? "Delete" : "Cancel",
+                                  preloadedCid != null
+                                      ? 'collectionScreen.delete'.tr()
+                                      : 'collectionScreen.cancel'.tr(),
                                   style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold),

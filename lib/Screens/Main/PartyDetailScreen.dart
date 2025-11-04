@@ -2,6 +2,7 @@ import 'package:kskfinance/Utilities/Reports/CusFullTrans/ReportScreen2.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:kskfinance/Screens/Main/CollectionScreen.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
 import 'package:kskfinance/Screens/Main/LendingScreen.dart';
@@ -103,7 +104,7 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
           'PartyPhnone']; // Ensure the column name matches your database
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error fetching phone number')),
+        SnackBar(content: Text('partyDetailScreen.errorFetchingPhone'.tr())),
       );
       return null;
     }
@@ -115,7 +116,7 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
       await launchUrl(phoneUri);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not launch phone dialer')),
+        SnackBar(content: Text('partyDetailScreen.couldNotLaunchDialer'.tr())),
       );
     }
   }
@@ -131,7 +132,7 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(partyName ?? 'Party Details'),
+        title: Text(partyName ?? 'partyDetailScreen.title'.tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -153,12 +154,16 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                   makePhoneCall(phoneNumber);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Phone number not available')),
+                    SnackBar(
+                        content:
+                            Text('partyDetailScreen.phoneNotAvailable'.tr())),
                   );
                 }
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Invalid party details')),
+                  SnackBar(
+                      content:
+                          Text('partyDetailScreen.invalidPartyDetails'.tr())),
                 );
               }
             },
@@ -177,7 +182,7 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
             child: EmptyCard1(
               screenHeight: MediaQuery.of(context).size.height * 1.50,
               screenWidth: MediaQuery.of(context).size.width,
-              title: 'Party Details',
+              title: 'partyDetailScreen.partyDetails'.tr(),
               content: Consumer(
                 builder: (context, ref, child) {
                   final lenId = ref.watch(lenIdProvider);
@@ -271,7 +276,7 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Text(
-                                        'Day View',
+                                        'partyDetailScreen.dayView'.tr(),
                                         style: TextStyle(
                                           color: !_isWeeklyView
                                               ? Colors.white
@@ -300,7 +305,7 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Text(
-                                        'Week View',
+                                        'partyDetailScreen.weekView'.tr(),
                                         style: TextStyle(
                                           color: _isWeeklyView
                                               ? Colors.white
@@ -322,9 +327,9 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Total Given:',
-                                      style: TextStyle(
+                                    Text(
+                                      'partyDetailScreen.totalGiven'.tr(),
+                                      style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
                                     ),
@@ -339,9 +344,9 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Collected:',
-                                      style: TextStyle(
+                                    Text(
+                                      'partyDetailScreen.collected'.tr(),
+                                      style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
                                     ),
@@ -356,9 +361,9 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Pending:',
-                                      style: TextStyle(
+                                    Text(
+                                      'partyDetailScreen.pending'.tr(),
+                                      style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
                                     ),
@@ -381,8 +386,8 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                   children: [
                                     Text(
                                       _isWeeklyView
-                                          ? 'Weeks Over:'
-                                          : 'Days Over:',
+                                          ? 'partyDetailScreen.weeksOver'.tr()
+                                          : 'partyDetailScreen.daysOver'.tr(),
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
@@ -401,7 +406,9 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      _isWeeklyView ? 'Weeks' : 'Days',
+                                      _isWeeklyView
+                                          ? 'partyDetailScreen.weeks'.tr()
+                                          : 'partyDetailScreen.days'.tr(),
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
@@ -409,11 +416,11 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                     Text(
                                       daysrem != null && daysrem < 0
                                           ? (_isWeeklyView
-                                              ? 'Overdue: ${(daysrem.abs() / 7).toStringAsFixed(1)}'
-                                              : 'Overdue: ${daysrem.abs()}')
+                                              ? '${'partyDetailScreen.overdue'.tr()} ${(daysrem.abs() / 7).toStringAsFixed(1)}'
+                                              : '${'partyDetailScreen.overdue'.tr()} ${daysrem.abs()}')
                                           : (_isWeeklyView
-                                              ? 'Remaining: ${(daysrem / 7).toStringAsFixed(1)}'
-                                              : 'Remaining: $daysrem'),
+                                              ? '${'partyDetailScreen.remaining'.tr()} ${(daysrem / 7).toStringAsFixed(1)}'
+                                              : '${'partyDetailScreen.remaining'.tr()} $daysrem'),
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w900,
@@ -435,8 +442,8 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                   children: [
                                     Text(
                                       _isWeeklyView
-                                          ? 'Weeks Paid:'
-                                          : 'Days Paid:',
+                                          ? 'partyDetailScreen.weeksPaid'.tr()
+                                          : 'partyDetailScreen.daysPaid'.tr(),
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
@@ -457,11 +464,11 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                     Text(
                                       pendays < 0
                                           ? (_isWeeklyView
-                                              ? 'Advance Weeks Paid: ${(pendays.abs() / 7).toStringAsFixed(1)}'
-                                              : 'Advance Days Paid: ${pendays.abs().toStringAsFixed(2)}')
+                                              ? '${'partyDetailScreen.advanceWeeksPaid'.tr()} ${(pendays.abs() / 7).toStringAsFixed(1)}'
+                                              : '${'partyDetailScreen.advanceDaysPaid'.tr()} ${pendays.abs().toStringAsFixed(2)}')
                                           : (_isWeeklyView
-                                              ? 'Pending Weeks: ${(pendays / 7).toStringAsFixed(1)}'
-                                              : 'Pending Days: ${pendays.toStringAsFixed(2)}'),
+                                              ? '${'partyDetailScreen.pendingWeeks'.tr()} ${(pendays / 7).toStringAsFixed(1)}'
+                                              : '${'partyDetailScreen.pendingDays'.tr()} ${pendays.toStringAsFixed(2)}'),
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w900,
@@ -482,9 +489,9 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Lent Date:',
-                                      style: TextStyle(
+                                    Text(
+                                      'partyDetailScreen.lentDate'.tr(),
+                                      style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
                                     ),
@@ -499,9 +506,9 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Due Date:',
-                                      style: TextStyle(
+                                    Text(
+                                      'partyDetailScreen.dueDate'.tr(),
+                                      style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w900),
                                     ),
@@ -532,7 +539,7 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
-                'Entry Details',
+                'partyDetailScreen.entryDetails'.tr(),
                 style: GoogleFonts.tinos(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -553,7 +560,8 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No entries found.'));
+                  return Center(
+                      child: Text('partyDetailScreen.noEntriesFound'.tr()));
                 } else {
                   final List<Map<String, dynamic>> entries =
                       List.from(snapshot.data!);
@@ -628,23 +636,25 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                           MainAxisAlignment.spaceAround,
                                       children: [
                                         _buildSummaryItem(
-                                          "Credit",
+                                          'partyDetailScreen.credit'.tr(),
                                           totalAmtGivenWithProfit,
                                           Colors.red,
                                           additionalInfo: dueDays > 0
                                               ? "(${dueDays.toStringAsFixed(2)})"
-                                              : "(N/A)", // Add calculation for Credit
+                                              : 'partyDetailScreen.notAvailable'
+                                                  .tr(), // Add calculation for Credit
                                         ),
                                         _buildSummaryItem(
-                                          "Debit",
+                                          'partyDetailScreen.debit'.tr(),
                                           amtCollected,
                                           Colors.green,
                                           additionalInfo: dueDays > 0
                                               ? "(${(amtCollected / perdayamt).toStringAsFixed(2)})"
-                                              : "(N/A)", // Add calculation for Debit
+                                              : 'partyDetailScreen.notAvailable'
+                                                  .tr(), // Add calculation for Debit
                                         ),
                                         _buildSummaryItem(
-                                          "Balance",
+                                          'partyDetailScreen.balance'.tr(),
                                           balance.abs(),
                                           balance >= 0
                                               ? const Color.fromARGB(
@@ -685,8 +695,8 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
                                     .format(DateFormat('yyyy-MM-dd')
                                         .parse(rawDate));
                                 final amountText = isCredit
-                                    ? "Credit: ₹${crAmt.toStringAsFixed(2)}"
-                                    : "Debit: ₹${drAmt.toStringAsFixed(2)}";
+                                    ? "${'partyDetailScreen.credit'.tr()}: ₹${crAmt.toStringAsFixed(2)}"
+                                    : "${'partyDetailScreen.debit'.tr()}: ₹${drAmt.toStringAsFixed(2)}";
                                 final amountColor = isCredit
                                     ? Colors.red.shade600
                                     : Colors.green.shade700;
@@ -825,20 +835,20 @@ class _PartyDetailScreenState extends ConsumerState<PartyDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               FloatingActionButtonWithText(
-                label: 'You Gave',
+                label: 'partyDetailScreen.youGave'.tr(),
                 navigateTo: LendingCombinedDetailsScreen2(),
                 icon: Icons.add,
                 color: Colors.purple,
               ),
               FloatingActionButtonWithText(
-                label: 'Report',
+                label: 'partyDetailScreen.report'.tr(),
                 // navigateTo: ViewReportsPage(),
                 navigateTo: ReportScreen2(lenId: lenId),
                 icon: Icons.picture_as_pdf_outlined,
                 color: Colors.brown,
               ),
               FloatingActionButtonWithText(
-                label: 'You Got',
+                label: 'partyDetailScreen.youGot'.tr(),
                 navigateTo: CollectionScreen(),
                 icon: Icons.add,
                 color: Colors.green,

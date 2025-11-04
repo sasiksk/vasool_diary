@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:kskfinance/Utilities/Reports/Dailyreport/PartyReportPage.dart';
 import 'package:kskfinance/Screens/UtilScreens/Backuppage.dart';
 import 'package:kskfinance/Utilities/Reports/PendingReport/PartyPendingDetailsScreen.dart';
@@ -51,9 +52,9 @@ class QuickActionsCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              const Text(
-                'Quick Actions',
-                style: TextStyle(
+              Text(
+                'home.quickActions'.tr(),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -74,14 +75,14 @@ class QuickActionsCard extends StatelessWidget {
               itemBuilder: (context, index) {
                 final actions = [
                   {
-                    'title': 'Collection\nEntry',
+                    'title': 'home.collectionEntry'.tr(),
                     'icon': Icons.payments,
                     'color': const Color(0xFF667eea),
                     'isPrimary': true,
                     'onTap': onCollectionEntryTap,
                   },
                   {
-                    'title': 'Party\nReport',
+                    'title': 'home.partyReport'.tr(),
                     'icon': Icons.analytics,
                     'color': const Color(0xFF764ba2),
                     'isPrimary': true,
@@ -92,7 +93,7 @@ class QuickActionsCard extends StatelessWidget {
                         ),
                   },
                   {
-                    'title': 'Backup\nData',
+                    'title': 'home.backupData'.tr(),
                     'icon': Icons.cloud_upload,
                     'color': const Color(0xFF42A5F5),
                     'isPrimary': false,
@@ -103,7 +104,7 @@ class QuickActionsCard extends StatelessWidget {
                         ),
                   },
                   {
-                    'title': 'Follow Up',
+                    'title': 'home.followUp'.tr(),
                     'icon': Icons.schedule,
                     'color': const Color(0xFF81D4FA),
                     'isPrimary': false,
@@ -116,7 +117,7 @@ class QuickActionsCard extends StatelessWidget {
                         ),
                   },
                   {
-                    'title': 'All\nReports',
+                    'title': 'home.allReports'.tr(),
                     'icon': Icons.folder_open,
                     'color': const Color(0xFF2196F3),
                     'isPrimary': false,

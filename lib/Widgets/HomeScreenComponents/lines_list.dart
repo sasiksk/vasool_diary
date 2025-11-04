@@ -4,6 +4,7 @@ import 'package:kskfinance/Screens/Main/LineScreen.dart';
 import 'package:kskfinance/Screens/Main/linedetailScreen.dart';
 import 'package:kskfinance/finance_provider.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class LinesList extends ConsumerWidget {
   final List<String> lineNames;
@@ -36,11 +37,11 @@ class LinesList extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(20),
+          Padding(
+            padding: const EdgeInsets.all(20),
             child: Text(
-              'Your Lines',
-              style: TextStyle(
+              'home.yourLines'.tr(),
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
@@ -109,16 +110,16 @@ class LinesList extends ConsumerWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirm Deletion'),
-          content: const Text(
-              'Are you sure you want to delete this line? All parties inside will be deleted.'),
+          title: Text('lines.confirmDeletion'.tr()),
+          content: Text('lines.deletionWarning'.tr()),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: Text('actions.cancel'.tr()),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+              child: Text('actions.delete'.tr(),
+                  style: const TextStyle(color: Colors.red)),
               onPressed: () async {
                 Navigator.of(context).pop();
                 final lenIds = await dbLending.getLenIdsByLineName(lineName);
@@ -184,7 +185,7 @@ class LineListItem extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          'Balance: ₹${calculatedValue.toStringAsFixed(0)}',
+          '${'home.balance'.tr()}: ₹${calculatedValue.toStringAsFixed(0)}',
           style: TextStyle(
             color: calculatedValue >= 0 ? Colors.green : Colors.red,
             fontWeight: FontWeight.w500,
@@ -192,14 +193,15 @@ class LineListItem extends StatelessWidget {
         ),
         trailing: PopupMenuButton<String>(
           onSelected: (String value) {
-            if (value == 'Update') {
+            if (value == 'actions.update'.tr()) {
               onUpdate();
-            } else if (value == 'Delete') {
+            } else if (value == 'actions.delete'.tr()) {
               onDelete();
             }
           },
           itemBuilder: (BuildContext context) {
-            return {'Update', 'Delete'}.map((String choice) {
+            return ['actions.update'.tr(), 'actions.delete'.tr()]
+                .map((String choice) {
               return PopupMenuItem<String>(
                 value: choice,
                 child: Text(choice),

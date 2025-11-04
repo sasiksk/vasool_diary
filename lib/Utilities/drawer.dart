@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:kskfinance/ContactUs.dart';
 import 'package:kskfinance/Screens/Main/BulkInsert/AddressBasedBulkInsertScreen.dart';
-import 'package:kskfinance/Screens/Main/BulkInsert/CollectionEntryScreen.dart';
 import 'package:kskfinance/Screens/Main/BulkInsert/EnhancedBulkInsertScreen.dart';
-import 'package:kskfinance/Screens/Main/BulkInsert/IndividualCollectionScreen.dart';
+import 'package:kskfinance/Screens/Main/OnboardingScreen.dart';
 import 'package:kskfinance/Screens/TableDetailsScreen.dart';
 import 'package:kskfinance/Screens/Main/PartySearchScreen.dart';
 
 import 'package:kskfinance/Screens/UtilScreens/Backuppage.dart';
-import 'package:kskfinance/ContactUs.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
 import 'package:kskfinance/Screens/UtilScreens/Restore.dart';
 import 'package:kskfinance/Utilities/Reports/CustomerReportScreen.dart';
 import 'package:kskfinance/Screens/Main/home_screen.dart';
 import 'package:kskfinance/Utilities/app_rating_share.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Widget buildDrawer(BuildContext context) {
   return Drawer(
+    // Add a key that changes with locale to force rebuild
+    key: ValueKey(context.locale.languageCode),
     child: Column(
       children: [
         // Gradient Header with user info
@@ -36,26 +39,32 @@ Widget buildDrawer(BuildContext context) {
           ),
           child: Column(
             children: [
-              GestureDetector(
-                onTap: () => _handleAvatarTap(context),
-                child: const CircleAvatar(
-                  radius: 35,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.person, size: 40, color: Colors.blueAccent),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () => _handleAvatarTap(context),
+                    child: const CircleAvatar(
+                      radius: 35,
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.person,
+                          size: 40, color: Colors.blueAccent),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
-              const Text(
-                'Welcome!',
-                style: TextStyle(
+              Text(
+                'app.welcome'.tr(),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
-              const Text(
-                'Vasool Diary',
-                style: TextStyle(
+              Text(
+                'app.title'.tr(),
+                style: const TextStyle(
                   fontSize: 14,
                   color: Colors.white70,
                 ),
@@ -72,7 +81,7 @@ Widget buildDrawer(BuildContext context) {
               _buildDrawerItem(
                 context,
                 icon: Icons.home,
-                title: 'Home',
+                title: 'navigation.home'.tr(),
                 onTap: () => _navigateTo(context, const HomeScreen()),
               ),
               /*  _buildDrawerItem(
@@ -84,7 +93,7 @@ Widget buildDrawer(BuildContext context) {
               _buildDrawerItem(
                 context,
                 icon: Icons.monetization_on,
-                title: 'Collection Entry',
+                title: 'navigation.collections'.tr(),
                 onTap: () {
                   Navigator.pop(context); // Close drawer first
                   _showCollectionTypeDialog(context);
@@ -93,25 +102,26 @@ Widget buildDrawer(BuildContext context) {
               _buildDrawerItem(
                 context,
                 icon: Icons.search,
-                title: 'Search Parties',
+                title: 'navigation.parties'.tr(),
                 onTap: () => _navigateTo(context, const PartySearchScreen()),
               ),
               _buildDrawerItem(
                 context,
                 icon: Icons.backup,
-                title: 'Back Up',
+                title: 'navigation.backup'.tr(),
                 onTap: () => _navigateTo(context, const DownloadDBScreen()),
               ),
               _buildDrawerItem(
                 context,
                 icon: Icons.restore,
-                title: 'Restore',
+                title: 'navigation.restore'.tr(),
                 onTap: () => _navigateTo(context, RestorePage()),
               ),
+              // Auto Backup is now invisible - works automatically in background
               _buildDrawerItem(
                 context,
                 icon: Icons.picture_as_pdf,
-                title: 'View Reports',
+                title: 'navigation.reports'.tr(),
                 onTap: () => _navigateTo(context, const ViewReportsPage()),
               ),
               const Divider(thickness: 1),
@@ -120,7 +130,7 @@ Widget buildDrawer(BuildContext context) {
               _buildDrawerItem(
                 context,
                 icon: Icons.star,
-                title: 'Rate App',
+                title: 'drawer.rateApp'.tr(),
                 onTap: () {
                   Navigator.pop(context);
                   AppRatingShare.showRateAppDialog(context);
@@ -129,7 +139,7 @@ Widget buildDrawer(BuildContext context) {
               _buildDrawerItem(
                 context,
                 icon: Icons.share,
-                title: 'Share App',
+                title: 'drawer.shareApp'.tr(),
                 onTap: () {
                   Navigator.pop(context);
                   AppRatingShare.showShareAppSheet(context);
@@ -138,7 +148,7 @@ Widget buildDrawer(BuildContext context) {
               _buildDrawerItem(
                 context,
                 icon: Icons.system_update,
-                title: 'Update App',
+                title: 'drawer.updateApp'.tr(),
                 onTap: () {
                   Navigator.pop(context);
                   AppRatingShare.rateApp();
@@ -149,19 +159,25 @@ Widget buildDrawer(BuildContext context) {
               _buildDrawerItem(
                 context,
                 icon: Icons.restore_from_trash,
-                title: 'Reset All',
+                title: 'drawer.resetAll'.tr(),
                 onTap: () => _showResetConfirmationDialog(context),
               ),
+              /* _buildDrawerItem(
+                context,
+                icon: Icons.app_registration,
+                title: 'drawer.resetForRegistration'.tr(),
+                onTap: () => _showRegistrationResetDialog(context),
+              ),*/
               _buildDrawerItem(
                 context,
                 icon: Icons.contact_phone,
-                title: 'Contact Us',
+                title: 'settings.contactUs'.tr(),
                 onTap: () => _navigateTo(context, const ContactPage()),
               ),
               _buildDrawerItem(
                 context,
                 icon: Icons.exit_to_app,
-                title: 'Exit',
+                title: 'drawer.exit'.tr(),
                 onTap: () => SystemNavigator.pop(),
               ),
             ],
@@ -177,21 +193,22 @@ void _showCollectionTypeDialog(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.upload_file, color: Colors.purple, size: 28),
-            SizedBox(width: 8),
-            Text('Collection Entry Type'),
+            const Icon(Icons.upload_file, color: Colors.purple, size: 28),
+            const SizedBox(width: 8),
+            Text('drawer.collectionType'.tr()),
           ],
         ),
-        content: const Text(
-          'Choose the type of collection entry you want to perform:',
-          style: TextStyle(fontSize: 16),
+        content: Text(
+          'drawer.chooseCollectionType'.tr(),
+          style: const TextStyle(fontSize: 16),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text('actions.cancel'.tr(),
+                style: const TextStyle(color: Colors.grey)),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -204,8 +221,8 @@ void _showCollectionTypeDialog(BuildContext context) {
               );
             },
             icon: const Icon(Icons.list_alt, color: Colors.white),
-            label: const Text('All Parties',
-                style: TextStyle(color: Colors.white)),
+            label: Text('drawer.allParties'.tr(),
+                style: const TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
             ),
@@ -221,7 +238,8 @@ void _showCollectionTypeDialog(BuildContext context) {
               );
             },
             icon: const Icon(Icons.location_on, color: Colors.white),
-            label: const Text('By Area', style: TextStyle(color: Colors.white)),
+            label: Text('drawer.byArea'.tr(),
+                style: const TextStyle(color: Colors.white)),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.purple,
             ),
@@ -243,14 +261,20 @@ Widget _buildDrawerItem(
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: Colors.teal.shade700),
           const SizedBox(width: 20),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+              softWrap: true,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
@@ -269,15 +293,15 @@ void _showResetConfirmationDialog(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: const Text('Confirm'),
-        content: const Text('Are you sure you want to reset all data?'),
+        title: Text('drawer.confirm'.tr()),
+        content: Text('drawer.resetConfirmation'.tr()),
         actions: [
           TextButton(
-            child: const Text('Cancel'),
+            child: Text('actions.cancel'.tr()),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: const Text('OK'),
+            child: Text('actions.confirm'.tr()),
             onPressed: () {
               DatabaseHelper.dropDatabase();
               Navigator.of(context).pop();
@@ -285,12 +309,11 @@ void _showResetConfirmationDialog(BuildContext context) {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text('Success'),
-                    content:
-                        const Text('All data has been reset successfully.'),
+                    title: Text('messages.success'.tr()),
+                    content: Text('drawer.resetSuccess'.tr()),
                     actions: [
                       TextButton(
-                        child: const Text('OK'),
+                        child: Text('actions.confirm'.tr()),
                         onPressed: () {
                           Navigator.of(context)
                               .popUntil((route) => route.isFirst);
@@ -340,11 +363,62 @@ void _handleAvatarTap(BuildContext context) {
 
     // Optional: Show a brief message
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Secret access activated! 🎉'),
-        duration: Duration(seconds: 1),
+      SnackBar(
+        content: Text('drawer.secretAccess'.tr()),
+        duration: const Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
     );
+  }
+}
+
+void _showRegistrationResetDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.app_registration, color: Colors.blue, size: 28),
+            const SizedBox(width: 8),
+            Text('drawer.registrationReset'.tr()),
+          ],
+        ),
+        content: Text('drawer.registrationResetWarning'.tr()),
+        actions: [
+          TextButton(
+            child: Text('actions.cancel'.tr()),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: Text('actions.confirm'.tr()),
+            onPressed: () async {
+              // Clear registration data
+              await _clearRegistrationData();
+              Navigator.of(context).pop();
+
+              // Navigate to onboarding
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (context) => const OnboardingScreen()),
+                (route) => false,
+              );
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<void> _clearRegistrationData() async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isFirstLaunch', true);
+    await prefs.remove('userName');
+    await prefs.remove('userPhone');
+    await prefs.remove('deviceId');
+  } catch (e) {
+    print('Error clearing registration data: $e');
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kskfinance/finance_provider.dart';
 import 'party_report_pdf.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class PartyReportPage extends ConsumerStatefulWidget {
   const PartyReportPage({Key? key}) : super(key: key);
@@ -83,7 +84,7 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('📄 Party-wise Lending Report'),
+          title: Text('partyReportScreen.title'.tr()),
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
@@ -91,7 +92,7 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                '📋 Lending Summary',
+                'partyReportScreen.lendingSummary'.tr(),
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.primaryColorDark,
@@ -99,8 +100,7 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                'View detailed lending and collection history by party. '
-                'Select a party or generate the full report.',
+                'partyReportScreen.description'.tr(),
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 20),
@@ -117,7 +117,7 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Search & Select Party',
+                    Text('partyReportScreen.searchAndSelect'.tr(),
                         style: theme.textTheme.titleMedium),
                     const SizedBox(height: 12),
 
@@ -125,7 +125,7 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
                     TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        hintText: 'Type to search party names...',
+                        hintText: 'partyReportScreen.typeToSearch'.tr(),
                         prefixIcon: const Icon(Icons.search),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -166,8 +166,12 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Select Party', style: theme.textTheme.bodyMedium),
-                        Text('Found ${_filteredPartyNames.length} parties',
+                        Text('partyReportScreen.selectParty'.tr(),
+                            style: theme.textTheme.bodyMedium),
+                        Text(
+                            'partyReportScreen.foundParties'.tr(namedArgs: {
+                              'count': _filteredPartyNames.length.toString()
+                            }),
                             style: TextStyle(
                                 fontSize: 12, color: Colors.grey.shade600)),
                       ],
@@ -187,8 +191,8 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
                                 Icon(Icons.info_outline,
                                     color: Colors.grey.shade500, size: 20),
                                 const SizedBox(width: 8),
-                                const Text('No parties found',
-                                    style: TextStyle(color: Colors.grey)),
+                                Text('partyReportScreen.noPartiesFound'.tr(),
+                                    style: const TextStyle(color: Colors.grey)),
                               ],
                             ),
                           )
@@ -215,7 +219,7 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
                                           ),
                                           const SizedBox(width: 8),
                                           Text(name.isEmpty
-                                              ? '(Unnamed)'
+                                              ? 'partyReportScreen.unnamed'.tr()
                                               : name),
                                         ],
                                       ),
@@ -241,8 +245,7 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '💡 This report helps you track each party’s total lent amount, due dates, and collections. '
-                  'Perfect for printing or sharing as a professional PDF summary.',
+                  'partyReportScreen.infoMessage'.tr(),
                   style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
                   textAlign: TextAlign.justify,
                 ),
@@ -265,7 +268,9 @@ class _PartyReportPageState extends ConsumerState<PartyReportPage> {
                   label: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     child: Text(
-                      _loading ? 'Generating PDF...' : 'Download & Save PDF',
+                      _loading
+                          ? 'partyReportScreen.generatingPdf'.tr()
+                          : 'partyReportScreen.downloadSavePdf'.tr(),
                       style: const TextStyle(fontSize: 16),
                     ),
                   ),

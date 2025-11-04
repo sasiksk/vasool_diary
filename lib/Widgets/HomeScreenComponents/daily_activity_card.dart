@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class DailyActivityCard extends StatelessWidget {
   final DateTime selectedDate;
@@ -48,9 +49,9 @@ class DailyActivityCard extends StatelessWidget {
                 child: const Icon(Icons.today, color: Colors.orange, size: 20),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'Daily Activity',
-                style: TextStyle(
+              Text(
+                'home.dailyActivity'.tr(),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -118,7 +119,7 @@ class DailyActivityCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _buildDailyStatItem(
-                        'Collections',
+                        'home.collections'.tr(),
                         '₹${_numberFormat.format(todaysTotalDrAmt)}',
                         Icons.arrow_downward,
                         Colors.green,
@@ -131,7 +132,7 @@ class DailyActivityCard extends StatelessWidget {
                     ),
                     Expanded(
                       child: _buildDailyStatItem(
-                        'Given',
+                        'home.given'.tr(),
                         '₹${_numberFormat.format(todaysTotalCrAmt)}',
                         Icons.arrow_upward,
                         Colors.red,

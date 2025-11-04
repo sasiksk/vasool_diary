@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
 import 'package:kskfinance/Utilities/CustomTextField.dart';
 import 'package:kskfinance/finance_provider.dart';
@@ -116,7 +117,7 @@ class _PartyScreenState extends ConsumerState<PartyScreen> {
             updatedValues: partyDetails,
           );
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Party updated successfully')),
+            SnackBar(content: Text('partyScreen.partyUpdatedSuccess'.tr())),
           );
         } else {
           // Insert new entry
@@ -133,7 +134,7 @@ class _PartyScreenState extends ConsumerState<PartyScreen> {
             sms: _sms,
           );
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Party added successfully')),
+            SnackBar(content: Text('partyScreen.partyAddedSuccess'.tr())),
           );
         }
 
@@ -154,9 +155,9 @@ class _PartyScreenState extends ConsumerState<PartyScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Party Screen',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          'partyScreen.title'.tr(),
+          style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue,
       ),
@@ -170,7 +171,7 @@ class _PartyScreenState extends ConsumerState<PartyScreen> {
               children: [
                 const SizedBox(height: 16.0),
                 Text(
-                  'Book Name: $_lineName',
+                  '${'partyScreen.bookName'.tr()}: $_lineName',
                   style: const TextStyle(fontSize: 16.0),
                 ),
                 const SizedBox(height: 16.0),
@@ -180,11 +181,11 @@ class _PartyScreenState extends ConsumerState<PartyScreen> {
                     child: CustomTextField(
                       controller: _partyidController,
                       enabled: false,
-                      labelText: 'Party id',
-                      hintText: 'Enter a unique Party id',
+                      labelText: 'partyScreen.partyId'.tr(),
+                      hintText: 'partyScreen.enterPartyId'.tr(),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter Party Id';
+                          return 'partyScreen.partyIdRequired'.tr();
                         }
                         return null;
                       },
@@ -197,11 +198,11 @@ class _PartyScreenState extends ConsumerState<PartyScreen> {
                     child: CustomTextField(
                       controller: _partyidController..text = '4',
                       enabled: false,
-                      labelText: 'Party id',
-                      hintText: 'Enter a unique Party id',
+                      labelText: 'partyScreen.partyId'.tr(),
+                      hintText: 'partyScreen.enterPartyId'.tr(),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter Party Id';
+                          return 'partyScreen.partyIdRequired'.tr();
                         }
                         return null;
                       },
@@ -213,11 +214,11 @@ class _PartyScreenState extends ConsumerState<PartyScreen> {
                 ),
                 CustomTextField(
                   controller: _partyNameController,
-                  labelText: 'Party Name',
-                  hintText: 'Enter Party Name',
+                  labelText: 'partyScreen.partyName'.tr(),
+                  hintText: 'partyScreen.enterPartyName'.tr(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter Party Name';
+                      return 'partyScreen.partyNameRequired'.tr();
                     }
                     return null;
                   },
@@ -225,19 +226,18 @@ class _PartyScreenState extends ConsumerState<PartyScreen> {
                 const SizedBox(height: 16.0),
                 CustomTextField(
                   controller: _partyPhoneNumberController,
-                  labelText: 'Party Phone Number(Optional)',
-                  hintText: 'Enter Party Phone Number-Optional',
-                  // Optional field, so no validator needed
+                  labelText: 'partyScreen.partyPhoneNumber'.tr(),
+                  hintText: 'partyScreen.enterPhoneNumber'.tr(),
                   keyboardType: TextInputType.number,
                   validator: (value) {
                     if (_sms && (value == null || value.isEmpty)) {
-                      return 'Please enter Party Phone Number for SMS notifications';
+                      return 'partyScreen.phoneRequired'.tr();
                     }
                     if (value != null && value.isNotEmpty) {
                       if (value.length != 10) {
-                        return 'Party Phone Number must be 10 digits';
+                        return 'partyScreen.phoneLength'.tr();
                       } else if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
-                        return 'Please enter a valid Party Phone Number';
+                        return 'partyScreen.phoneInvalid'.tr();
                       }
                     }
                     return null;
@@ -246,24 +246,22 @@ class _PartyScreenState extends ConsumerState<PartyScreen> {
                 const SizedBox(height: 16.0),
                 CustomTextField(
                   controller: _addressController,
-                  labelText:
-                      'Address(Optional)/Note : Party Details-Area/Location',
-                  hintText:
-                      'Enter Address/Party Details (Area/Location )-Optional',
+                  labelText: 'partyScreen.address'.tr(),
+                  hintText: 'partyScreen.enterAddress'.tr(),
                   validator: (value) {
                     return null; // Address is optional, so no validation needed
                   },
                 ),
                 const SizedBox(height: 16.0),
-                const Text(
-                  'SMS Notifications',
-                  style: TextStyle(fontSize: 16.0),
+                Text(
+                  'partyScreen.smsNotifications'.tr(),
+                  style: const TextStyle(fontSize: 16.0),
                 ),
                 Row(
                   children: [
                     Expanded(
                       child: RadioListTile<bool>(
-                        title: const Text('Yes'),
+                        title: Text('partyScreen.yes'.tr()),
                         value: true,
                         groupValue: _sms,
                         onChanged: (value) {
@@ -275,7 +273,7 @@ class _PartyScreenState extends ConsumerState<PartyScreen> {
                     ),
                     Expanded(
                       child: RadioListTile<bool>(
-                        title: const Text('No'),
+                        title: Text('partyScreen.no'.tr()),
                         value: false,
                         groupValue: _sms,
                         onChanged: (value) {
@@ -297,15 +295,16 @@ class _PartyScreenState extends ConsumerState<PartyScreen> {
                             _submitForm();
                           }
                         },
-                        child: Text(
-                            widget.partyName != null ? 'Update' : 'Submit'),
+                        child: Text(widget.partyName != null
+                            ? 'partyScreen.update'.tr()
+                            : 'partyScreen.submit'.tr()),
                       ),
                     ),
                     const SizedBox(width: 16.0),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: _resetForm,
-                        child: const Text('Reset'),
+                        child: Text('partyScreen.reset'.tr()),
                       ),
                     ),
                   ],
@@ -315,7 +314,7 @@ class _PartyScreenState extends ConsumerState<PartyScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text('Back'),
+                  child: Text('partyScreen.back'.tr()),
                 ),
               ],
             ),

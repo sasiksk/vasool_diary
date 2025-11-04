@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:kskfinance/Screens/Main/PartyDetailScreen.dart';
 import 'package:kskfinance/Utilities/AppBar.dart';
 import 'package:kskfinance/Utilities/drawer.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../finance_provider.dart';
 
 class PartySearchScreen extends ConsumerStatefulWidget {
@@ -42,7 +43,11 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading parties: $e')),
+          SnackBar(
+              content:
+                  Text('partySearchScreen.errorLoadingParties'.tr(namedArgs: {
+            'error': e.toString(),
+          }))),
         );
       }
     }
@@ -68,7 +73,7 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
   Future<void> makePhoneCall(String phoneNumber) async {
     if (phoneNumber.isEmpty || phoneNumber == 'null') {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Phone number not available')),
+        SnackBar(content: Text('partySearchScreen.phoneNotAvailable'.tr())),
       );
       return;
     }
@@ -80,14 +85,18 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not launch phone dialer')),
+            SnackBar(
+                content: Text('partySearchScreen.couldNotLaunchDialer'.tr())),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error making call: $e')),
+          SnackBar(
+              content: Text('partySearchScreen.errorMakingCall'.tr(namedArgs: {
+            'error': e.toString(),
+          }))),
         );
       }
     }
@@ -122,7 +131,10 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error navigating to party details: $e')),
+          SnackBar(
+              content: Text('partySearchScreen.errorNavigating'.tr(namedArgs: {
+            'error': e.toString(),
+          }))),
         );
       }
     }
@@ -133,7 +145,7 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
     return Scaffold(
       drawer: buildDrawer(context),
       appBar: CustomAppBar(
-        title: 'Search Parties',
+        title: 'partySearchScreen.title'.tr(),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -158,7 +170,7 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
               ),
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
-                hintText: 'Search by name or phone number',
+                hintText: 'partySearchScreen.searchHint'.tr(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20.0),
                 ),
@@ -177,7 +189,7 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
                 Expanded(
                   flex: 2,
                   child: Text(
-                    'Party Details',
+                    'partySearchScreen.partyDetails'.tr(),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -188,7 +200,7 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
                 Expanded(
                   flex: 1,
                   child: Text(
-                    'Balance',
+                    'partySearchScreen.balance'.tr(),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12,
@@ -210,16 +222,16 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
                     valueListenable: filteredPartiesNotifier,
                     builder: (context, filteredParties, _) {
                       if (filteredParties.isEmpty) {
-                        return const Center(
+                        return Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.search_off,
+                              const Icon(Icons.search_off,
                                   size: 50, color: Colors.grey),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Text(
-                                'No parties found',
-                                style: TextStyle(
+                                'partySearchScreen.noPartiesFound'.tr(),
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.grey,
@@ -239,10 +251,10 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
                               const SizedBox(height: 4),
                           itemBuilder: (context, index) {
                             final party = filteredParties[index];
-                            final partyName =
-                                party['PartyName']?.toString() ?? 'Unknown';
-                            final lineName =
-                                party['LineName']?.toString() ?? 'Unknown';
+                            final partyName = party['PartyName']?.toString() ??
+                                'partySearchScreen.unknown'.tr();
+                            final lineName = party['LineName']?.toString() ??
+                                'partySearchScreen.unknown'.tr();
                             final phoneNumber =
                                 party['PartyPhnone']?.toString() ?? '';
                             final balance =
@@ -320,7 +332,7 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
                                                   const SizedBox(height: 4),
                                                   // Line Name
                                                   Text(
-                                                    'Line: $lineName',
+                                                    '${'partySearchScreen.line'.tr()} $lineName',
                                                     style: GoogleFonts.tinos(
                                                       fontSize: 12,
                                                       color: Colors.white
@@ -334,7 +346,7 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
                                                     const SizedBox(height: 2),
                                                     // Phone Number
                                                     Text(
-                                                      'Ph: $phoneNumber',
+                                                      '${'partySearchScreen.phone'.tr()} $phoneNumber',
                                                       style: GoogleFonts.tinos(
                                                         fontSize: 12,
                                                         color: Colors.white
@@ -390,7 +402,11 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
                                                   onPressed: () =>
                                                       makePhoneCall(
                                                           phoneNumber),
-                                                  tooltip: 'Call $partyName',
+                                                  tooltip:
+                                                      'partySearchScreen.callParty'
+                                                          .tr(namedArgs: {
+                                                    'partyName': partyName,
+                                                  }),
                                                 ),
                                               )
                                             else
@@ -441,7 +457,9 @@ class PartySearchScreenState extends ConsumerState<PartySearchScreen> {
                     Icon(Icons.people, color: Colors.grey[600], size: 18),
                     const SizedBox(width: 8),
                     Text(
-                      '${filteredParties.length} ${filteredParties.length == 1 ? 'party' : 'parties'} found',
+                      'partySearchScreen.partiesFound'.tr(namedArgs: {
+                        'count': filteredParties.length.toString(),
+                      }),
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,

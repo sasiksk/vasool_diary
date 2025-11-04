@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:kskfinance/Screens/Main/BulkInsert/EnhancedBulkInsertScreen.dart';
 import 'package:kskfinance/Screens/Main/BulkInsert/AddressBasedBulkInsertScreen.dart';
 
@@ -8,21 +9,22 @@ class CollectionTypeDialog {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.upload_file, color: Colors.purple, size: 28),
-              SizedBox(width: 8),
-              Text('Collection Entry Type'),
+              const Icon(Icons.upload_file, color: Colors.purple, size: 28),
+              const SizedBox(width: 8),
+              Text('drawer.collectionType'.tr()),
             ],
           ),
-          content: const Text(
-            'Choose the type of collection entry you want to perform:',
-            style: TextStyle(fontSize: 16),
+          content: Text(
+            'drawer.chooseCollectionType'.tr(),
+            style: const TextStyle(fontSize: 16),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+              child: Text('actions.cancel'.tr(),
+                  style: const TextStyle(color: Colors.grey)),
             ),
             ElevatedButton.icon(
               onPressed: () {
@@ -35,8 +37,8 @@ class CollectionTypeDialog {
                 );
               },
               icon: const Icon(Icons.list_alt, color: Colors.white),
-              label: const Text('All Parties',
-                  style: TextStyle(color: Colors.white)),
+              label: Text('drawer.allParties'.tr(),
+                  style: const TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue,
               ),
@@ -52,8 +54,8 @@ class CollectionTypeDialog {
                 );
               },
               icon: const Icon(Icons.location_on, color: Colors.white),
-              label:
-                  const Text('By Area', style: TextStyle(color: Colors.white)),
+              label: Text('drawer.byArea'.tr(),
+                  style: const TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
               ),

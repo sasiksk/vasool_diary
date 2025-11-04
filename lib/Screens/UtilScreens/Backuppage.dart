@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart'; // For app-specific directories
 import 'package:lottie/lottie.dart'; // For animations
 import 'package:intl/intl.dart'; // For date formatting
+import 'package:easy_localization/easy_localization.dart';
 
 import '../../Data/Databasehelper.dart';
 
@@ -58,9 +59,9 @@ class DownloadDBScreen extends StatelessWidget {
                       repeat: true,
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Preparing your database backup...',
-                      style: TextStyle(
+                    Text(
+                      'backupScreen.preparingBackup'.tr(),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.red,
@@ -88,20 +89,19 @@ class DownloadDBScreen extends StatelessWidget {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Share Backup'),
-            content: const Text(
-                'Your database backup is ready. You can share it or save it to a secure location.'),
+            title: Text('backupScreen.shareBackupTitle'.tr()),
+            content: Text('backupScreen.shareBackupMessage'.tr()),
             actions: <Widget>[
               TextButton(
-                child: const Text('Share Backup'),
+                child: Text('backupScreen.shareBackupButton'.tr()),
                 onPressed: () async {
                   Navigator.of(context).pop(); // Dismiss the dialog
                   await Share.shareXFiles([XFile(backupFile.path)],
-                      text: 'Here is the backup of your database file.');
+                      text: 'backupScreen.shareBackupText'.tr());
                 },
               ),
               TextButton(
-                child: const Text('Close'),
+                child: Text('backupScreen.close'.tr()),
                 onPressed: () {
                   Navigator.of(context).pop(); // Dismiss the dialog
                 },
@@ -113,7 +113,10 @@ class DownloadDBScreen extends StatelessWidget {
     } catch (e) {
       debugPrint('Error creating backup: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error creating backup: $e")),
+        SnackBar(
+            content: Text('backupScreen.errorCreatingBackup'.tr(namedArgs: {
+          'error': e.toString(),
+        }))),
       );
     }
   }
@@ -147,12 +150,11 @@ class DownloadDBScreen extends StatelessWidget {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Delete Old Backups'),
-              content: const Text(
-                  'You have more than 10 backup files. Do you want to delete the oldest backups and keep only the latest 10? This will delete from both backup locations.'),
+              title: Text('backupScreen.deleteOldBackupsTitle'.tr()),
+              content: Text('backupScreen.deleteOldBackupsMessage'.tr()),
               actions: <Widget>[
                 TextButton(
-                  child: const Text('Yes'),
+                  child: Text('backupScreen.yes'.tr()),
                   onPressed: () async {
                     Navigator.of(context).pop(); // Dismiss the dialog
 
@@ -180,14 +182,13 @@ class DownloadDBScreen extends StatelessWidget {
 
                     // Show a snackbar or dialog to inform the user
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text(
-                              'Old backup files deleted from both locations.')),
+                      SnackBar(
+                          content: Text('backupScreen.oldBackupsDeleted'.tr())),
                     );
                   },
                 ),
                 TextButton(
-                  child: const Text('No'),
+                  child: Text('backupScreen.no'.tr()),
                   onPressed: () {
                     Navigator.of(context).pop(); // Dismiss the dialog
                   },
@@ -205,7 +206,7 @@ class DownloadDBScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Backup Database')),
+      appBar: AppBar(title: Text('backupScreen.title'.tr())),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -217,24 +218,25 @@ class DownloadDBScreen extends StatelessWidget {
               repeat: true,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Backup Your Database',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              'backupScreen.backupYourDatabase'.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 32.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: Text(
-                'Ensure your data is safe by creating a backup of your database. You can share the backup file or save it to a secure location.',
+                'backupScreen.ensureDataSafe'.tr(),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.black),
+                style: const TextStyle(fontSize: 14, color: Colors.black),
               ),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () => downloadDBFile(context),
               icon: const Icon(Icons.backup),
-              label: const Text('Start Backup'),
+              label: Text('backupScreen.startBackup'.tr()),
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.blue,

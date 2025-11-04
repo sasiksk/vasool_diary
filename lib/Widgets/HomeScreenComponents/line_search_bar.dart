@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class LineSearchBar extends StatefulWidget {
   final List<String> originalLineNames;
@@ -55,11 +56,12 @@ class _LineSearchBarState extends State<LineSearchBar> {
         ],
       ),
       child: TextField(
-        decoration: const InputDecoration(
-          hintText: 'Search lines...',
-          prefixIcon: Icon(Icons.search, color: Colors.grey),
+        decoration: InputDecoration(
+          hintText: 'home.searchLines'.tr(),
+          prefixIcon: const Icon(Icons.search, color: Colors.grey),
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         ),
         onChanged: _onSearchChanged,
       ),

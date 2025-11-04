@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:kskfinance/Data/Databasehelper.dart';
 
 import 'package:kskfinance/Screens/Main/PartyDetailScreen.dart';
@@ -106,7 +107,7 @@ class _LineDetailScreenState extends ConsumerState<LineDetailScreen> {
                 return EmptyCard1(
                   screenHeight: MediaQuery.of(context).size.height * 1.35,
                   screenWidth: MediaQuery.of(context).size.width * 1.10,
-                  title: 'Book Details',
+                  title: 'lineDetailScreen.bookDetails'.tr(),
                   content: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -114,11 +115,11 @@ class _LineDetailScreenState extends ConsumerState<LineDetailScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           buildAmountBlock(
-                            'Total Given:',
+                            'lineDetailScreen.totalGiven'.tr(),
                             data['totalAmtGiven']! + data['totalProfit']!,
                           ),
                           buildAmountBlock(
-                            'Collected:',
+                            'lineDetailScreen.collected'.tr(),
                             data['totalAmtCollected'] ?? 0.0,
                           ),
                         ],
@@ -126,7 +127,7 @@ class _LineDetailScreenState extends ConsumerState<LineDetailScreen> {
                       const SizedBox(height: 12),
                       Center(
                         child: buildAmountBlock(
-                          'You Will Get:',
+                          'lineDetailScreen.youWillGet'.tr(),
                           data['totalAmtGiven']! +
                               data['totalProfit']! -
                               data['totalAmtCollected']! -
@@ -278,7 +279,7 @@ class _LineDetailScreenState extends ConsumerState<LineDetailScreen> {
                 ),
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.search),
-                  hintText: 'Search Party',
+                  hintText: 'lineDetailScreen.searchParty'.tr(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20.0),
                   ),
@@ -301,7 +302,7 @@ class _LineDetailScreenState extends ConsumerState<LineDetailScreen> {
                 Expanded(
                   flex: 2,
                   child: Text(
-                    'Party Name',
+                    'lineDetailScreen.partyName'.tr(),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -312,7 +313,7 @@ class _LineDetailScreenState extends ConsumerState<LineDetailScreen> {
                 Expanded(
                   flex: 1,
                   child: Text(
-                    'Amount                              ',
+                    'lineDetailScreen.amount'.tr(),
                     textAlign: TextAlign.right,
                     style: TextStyle(
                       fontSize: 12,
@@ -329,16 +330,16 @@ class _LineDetailScreenState extends ConsumerState<LineDetailScreen> {
               valueListenable: filteredPartyNamesNotifier,
               builder: (context, filteredPartyNames, _) {
                 if (filteredPartyNames.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.warning_amber_rounded,
+                        const Icon(Icons.warning_amber_rounded,
                             size: 50, color: Colors.grey),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Text(
-                          'No Parties Found',
-                          style: TextStyle(
+                          'lineDetailScreen.noPartiesFound'.tr(),
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.grey,
@@ -473,20 +474,24 @@ class _LineDetailScreenState extends ConsumerState<LineDetailScreen> {
                                                         BorderRadius.circular(
                                                             12),
                                                   ),
-                                                  title: const Text(
-                                                      'Confirm Deletion'),
-                                                  content: const Text(
-                                                    'Are you sure you want to delete this party and related collections?',
-                                                    style:
-                                                        TextStyle(fontSize: 14),
+                                                  title: Text(
+                                                      'lineDetailScreen.confirmDeletion'
+                                                          .tr()),
+                                                  content: Text(
+                                                    'lineDetailScreen.deleteConfirmMessage'
+                                                        .tr(),
+                                                    style: const TextStyle(
+                                                        fontSize: 14),
                                                   ),
                                                   actions: <Widget>[
                                                     TextButton(
-                                                      child: const Text(
-                                                          'Cancel',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.grey)),
+                                                      child: Text(
+                                                          'lineDetailScreen.cancel'
+                                                              .tr(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .grey)),
                                                       onPressed: () {
                                                         if (mounted) {
                                                           Navigator.of(context)
@@ -495,10 +500,13 @@ class _LineDetailScreenState extends ConsumerState<LineDetailScreen> {
                                                       },
                                                     ),
                                                     TextButton(
-                                                      child: const Text('OK',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.red)),
+                                                      child: Text(
+                                                          'lineDetailScreen.ok'
+                                                              .tr(),
+                                                          style:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .red)),
                                                       onPressed: () async {
                                                         final parentContext =
                                                             context;
@@ -531,25 +539,27 @@ class _LineDetailScreenState extends ConsumerState<LineDetailScreen> {
                                         },
                                         itemBuilder: (BuildContext context) {
                                           return [
-                                            const PopupMenuItem<String>(
+                                            PopupMenuItem<String>(
                                               value: 'Update',
                                               child: Row(
                                                 children: [
-                                                  Icon(Icons.edit,
+                                                  const Icon(Icons.edit,
                                                       color: Colors.blue),
-                                                  SizedBox(width: 8),
-                                                  Text('Update'),
+                                                  const SizedBox(width: 8),
+                                                  Text('lineDetailScreen.update'
+                                                      .tr()),
                                                 ],
                                               ),
                                             ),
-                                            const PopupMenuItem<String>(
+                                            PopupMenuItem<String>(
                                               value: 'Delete',
                                               child: Row(
                                                 children: [
-                                                  Icon(Icons.delete,
+                                                  const Icon(Icons.delete,
                                                       color: Colors.red),
-                                                  SizedBox(width: 8),
-                                                  Text('Delete'),
+                                                  const SizedBox(width: 8),
+                                                  Text('lineDetailScreen.delete'
+                                                      .tr()),
                                                 ],
                                               ),
                                             ),
@@ -572,9 +582,9 @@ class _LineDetailScreenState extends ConsumerState<LineDetailScreen> {
           ),
         ],
       ),
-      floatingActionButton: const FloatingActionButtonWithText(
-        label: 'Add New Party',
-        navigateTo: PartyScreen(),
+      floatingActionButton: FloatingActionButtonWithText(
+        label: 'lineDetailScreen.addNewParty'.tr(),
+        navigateTo: const PartyScreen(),
         icon: Icons.add,
       ),
     );
